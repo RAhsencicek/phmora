@@ -1,43 +1,9 @@
 import SwiftUI
 import MapKit
 
-struct Pharmacy: Identifiable {
-    let id = UUID()
-    let name: String
-    let address: String
-    let phone: String
-    let coordinate: CLLocationCoordinate2D
-    var availableMedications: [Medication]
-}
-
-struct Medication: Identifiable {
-    var id = UUID()
-    let name: String
-    let description: String
-    let price: Double
-    let quantity: Int
-    let expiryDate: Date?
-    let imageURL: String?
-    let status: MedicationStatus
-    
-    init(name: String, description: String, price: Double, quantity: Int, expiryDate: Date?, imageURL: String?, status: MedicationStatus) {
-        self.name = name
-        self.description = description
-        self.price = price
-        self.quantity = quantity
-        self.expiryDate = expiryDate
-        self.imageURL = imageURL
-        self.status = status
-    }
-}
-
-enum MedicationStatus: String, CaseIterable {
-    case available = "Mevcut"
-    case forSale = "Satılık"
-    case reserved = "Rezerve"
-}
-
 struct HomeView: View {
+    @Binding var showAddMedicationSheet: Bool
+    
     @State private var pharmacies: [Pharmacy] = [
         Pharmacy(
             name: "Merkez Eczanesi",
@@ -45,7 +11,7 @@ struct HomeView: View {
             phone: "0212 123 4567",
             coordinate: CLLocationCoordinate2D(latitude: 41.0112, longitude: 28.9762),
             availableMedications: [
-                Medication(name: "Parol", description: "Ağrı kesici", price: 25.90, quantity: 10, expiryDate: Calendar.current.date(byAdding: .month, value: 6, to: Date()), imageURL: nil, status: .available),
+                Medication(name: "Parol", description: "Ağrı kesici", price: 25.90, quantity: 10, expiryDate: Calendar.current.date(byAdding: .month, value: 6, to: Date()), imageURL: nil, status: .forSale),
                 Medication(name: "Majezik", description: "Ağrı kesici", price: 32.50, quantity: 15, expiryDate: Calendar.current.date(byAdding: .month, value: 8, to: Date()), imageURL: nil, status: .forSale)
             ]
         ),
@@ -73,7 +39,6 @@ struct HomeView: View {
     
     @State private var selectedPharmacy: Pharmacy? = nil
     @State private var showPharmacyDetails = false
-    @State private var showAddMedicationSheet = false
     @State private var currentUserPharmacyIndex = 0 // Kullanıcının kendi eczanesinin indeksi
     
     var body: some View {
@@ -139,103 +104,15 @@ struct HomeView: View {
                     .presentationDragIndicator(.visible)
             }
         }
-        .sheet(isPresented: $showAddMedicationSheet) {
-            AddMedicationView(onSave: { newMedication in
-                if currentUserPharmacyIndex < pharmacies.count {
-                    pharmacies[currentUserPharmacyIndex].availableMedications.append(newMedication)
-                }
-                showAddMedicationSheet = false
-            })
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.visible)
-        }
         .navigationTitle("Eczaneler")
-    }
-}
-
-struct AddMedicationView: View {
-    @State private var name = ""
-    @State private var description = ""
-    @State private var price = ""
-    @State private var quantity = ""
-    @State private var expiryDate = Calendar.current.date(byAdding: .month, value: 6, to: Date()) ?? Date()
-    @State private var selectedStatus: MedicationStatus = .forSale
-    @State private var showImagePicker = false
-    @State private var image: Image?
-    
-    var onSave: (Medication) -> Void
-    
-    var isFormValid: Bool {
-        !name.isEmpty && !price.isEmpty && !quantity.isEmpty && Double(price) != nil && Int(quantity) != nil
-    }
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("İlaç Bilgileri")) {
-                    TextField("İlaç Adı", text: $name)
-                    TextField("Açıklama", text: $description)
-                    TextField("Fiyat (TL)", text: $price)
-                    TextField("Miktar", text: $quantity)
-                }
-                
-                Section(header: Text("Son Kullanma Tarihi")) {
-                    DatePicker("Tarih", selection: $expiryDate, displayedComponents: .date)
-                }
-                
-                Section(header: Text("Durum")) {
-                    Picker("Durum", selection: $selectedStatus) {
-                        ForEach(MedicationStatus.allCases, id: \.self) { status in
-                            Text(status.rawValue).tag(status)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                }
-                
-                Section(header: Text("Görsel")) {
-                    Button(action: {
-                        showImagePicker = true
-                    }) {
-                        HStack {
-                            Text("Görsel Ekle")
-                            Spacer()
-                            if image != nil {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.green)
-                            } else {
-                                Image(systemName: "photo")
-                                    .foregroundColor(Color(red: 0.4, green: 0.5, blue: 0.4))
-                            }
-                        }
-                    }
-                }
-            }
-            .navigationTitle("İlaç Ekle")
-            .navigationBarItems(
-                leading: Button("İptal") {
-                    // İptal işlemi
-                },
-                trailing: Button("Kaydet") {
-                    let newMedication = Medication(
-                        name: name,
-                        description: description,
-                        price: Double(price) ?? 0.0,
-                        quantity: Int(quantity) ?? 0,
-                        expiryDate: expiryDate,
-                        imageURL: nil,
-                        status: selectedStatus
-                    )
-                    onSave(newMedication)
-                }
-                .disabled(!isFormValid)
-            )
-        }
     }
 }
 
 struct PharmacyDetailView: View {
     let pharmacy: Pharmacy
     @State private var selectedTab = 0
+    @State private var showOfferSheet = false
+    @State private var selectedMedication: Medication? = nil
     
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
@@ -263,15 +140,280 @@ struct PharmacyDetailView: View {
             if selectedTab == 0 {
                 PharmacyInfoView(pharmacy: pharmacy)
             } else if selectedTab == 1 {
-                PharmacyMedicationsView(medications: pharmacy.availableMedications)
+                PharmacyMedicationsView(medications: pharmacy.availableMedications) { medication in
+                    selectedMedication = medication
+                    showOfferSheet = true
+                }
             } else {
-                PharmacyMedicationsView(medications: pharmacy.availableMedications.filter { $0.status == .forSale })
+                PharmacyMedicationsView(medications: pharmacy.availableMedications.filter { $0.status == .forSale }) { medication in
+                    selectedMedication = medication
+                    showOfferSheet = true
+                }
             }
             
             Spacer()
         }
         .padding()
         .background(Color(red: 0.95, green: 0.97, blue: 0.95))
+        .sheet(isPresented: $showOfferSheet) {
+            if let medication = selectedMedication {
+                MedicationDetailView(medication: medication, pharmacy: pharmacy)
+            }
+        }
+    }
+}
+
+struct MedicationDetailView: View {
+    let medication: Medication
+    let pharmacy: Pharmacy
+    @State private var showPurchaseSheet = false
+    @State private var showOfferSheet = false
+    
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    // İlaç görseli
+                    if let _ = medication.imageURL {
+                        Image(systemName: "pills.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 200)
+                            .frame(maxWidth: .infinity)
+                            .background(Color(red: 0.95, green: 0.97, blue: 0.95))
+                            .cornerRadius(10)
+                    } else {
+                        Image(systemName: "pills.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 200)
+                            .frame(maxWidth: .infinity)
+                            .foregroundColor(Color(red: 0.4, green: 0.5, blue: 0.4))
+                            .padding()
+                            .background(Color(red: 0.95, green: 0.97, blue: 0.95))
+                            .cornerRadius(10)
+                    }
+                    
+                    // İlaç bilgileri
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(medication.name)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        Text(medication.description)
+                            .foregroundColor(.gray)
+                        
+                        HStack {
+                            Label("Fiyat:", systemImage: "tag")
+                                .foregroundColor(.gray)
+                            Text("\(String(format: "%.2f", medication.price)) TL")
+                                .fontWeight(.semibold)
+                        }
+                        
+                        HStack {
+                            Label("Miktar:", systemImage: "number")
+                                .foregroundColor(.gray)
+                            Text("\(medication.quantity)")
+                                .fontWeight(.semibold)
+                        }
+                        
+                        if let expiryDate = medication.expiryDate {
+                            HStack {
+                                Label("Son Kullanma:", systemImage: "calendar")
+                                    .foregroundColor(.gray)
+                                Text(expiryDateFormatted(expiryDate))
+                                    .fontWeight(.semibold)
+                            }
+                        }
+                        
+                        HStack {
+                            Label("Durum:", systemImage: "circle.fill")
+                                .foregroundColor(.gray)
+                            Text(medication.status.rawValue)
+                                .fontWeight(.semibold)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 3)
+                                .background(statusColor(medication.status))
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(10)
+                    
+                    // Eczane bilgileri
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Eczane Bilgileri")
+                            .font(.headline)
+                        
+                        HStack {
+                            Label(pharmacy.name, systemImage: "cross")
+                                .foregroundColor(.primary)
+                        }
+                        
+                        HStack {
+                            Label(pharmacy.address, systemImage: "location")
+                                .foregroundColor(.gray)
+                        }
+                        
+                        HStack {
+                            Label(pharmacy.phone, systemImage: "phone")
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(10)
+                    
+                    // Satın alma ve teklif verme butonları
+                    if medication.status == .forSale {
+                        HStack {
+                            Button(action: {
+                                showPurchaseSheet = true
+                            }) {
+                                Label("Satın Al", systemImage: "cart")
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color(red: 0.4, green: 0.5, blue: 0.4))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10)
+                            }
+                            
+                            Button(action: {
+                                showOfferSheet = true
+                            }) {
+                                Label("Teklif Ver", systemImage: "text.badge.plus")
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.2))
+                                    .foregroundColor(Color(red: 0.4, green: 0.5, blue: 0.4))
+                                    .cornerRadius(10)
+                            }
+                        }
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle("İlaç Detayı")
+            .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showPurchaseSheet) {
+                PurchaseView(medication: medication) {
+                    // Satın alma işlemi tamamlandığında yapılacaklar
+                    showPurchaseSheet = false
+                }
+            }
+            .sheet(isPresented: $showOfferSheet) {
+                OfferView(medication: medication) {
+                    // Teklif verme işlemi tamamlandığında yapılacaklar
+                    showOfferSheet = false
+                }
+            }
+        }
+    }
+    
+    private func expiryDateFormatted(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
+    }
+    
+    private func statusColor(_ status: MedicationStatus) -> Color {
+        switch status {
+        case .available:
+            return Color.blue
+        case .forSale:
+            return Color(red: 0.85, green: 0.5, blue: 0.2)
+        case .reserved:
+            return Color.purple
+        case .sold:
+            return Color.gray
+        }
+    }
+}
+
+struct PharmacyMedicationsView: View {
+    let medications: [Medication]
+    var onMedicationTapped: (Medication) -> Void
+    
+    var body: some View {
+        if medications.isEmpty {
+            Text("İlaç bulunmuyor.")
+                .foregroundColor(.gray)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .center)
+        } else {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 15) {
+                    ForEach(medications) { medication in
+                        Button(action: {
+                            onMedicationTapped(medication)
+                        }) {
+                            VStack(alignment: .leading, spacing: 5) {
+                                HStack {
+                                    Text(medication.name)
+                                        .font(.headline)
+                                        .foregroundColor(Color(red: 0.3, green: 0.4, blue: 0.3))
+                                    
+                                    Spacer()
+                                    
+                                    if medication.status == .forSale {
+                                        Text(medication.status.rawValue)
+                                            .font(.caption)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 3)
+                                            .background(Color(red: 0.85, green: 0.5, blue: 0.2))
+                                            .foregroundColor(.white)
+                                            .cornerRadius(10)
+                                    }
+                                }
+                                
+                                Text(medication.description)
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                                
+                                if let expiryDate = medication.expiryDate {
+                                    Text("SKT: \(expiryDateFormatter.string(from: expiryDate))")
+                                        .font(.caption)
+                                        .foregroundColor(isExpiryClose(date: expiryDate) ? .red : .gray)
+                                }
+                                
+                                HStack {
+                                    Text("\(String(format: "%.2f", medication.price)) TL")
+                                        .fontWeight(.medium)
+                                    
+                                    Spacer()
+                                    
+                                    Text("Stok: \(medication.quantity)")
+                                        .font(.caption)
+                                        .padding(5)
+                                        .background(Color(red: 0.85, green: 0.9, blue: 0.85))
+                                        .cornerRadius(5)
+                                }
+                            }
+                            .padding(10)
+                            .background(Color.white)
+                            .cornerRadius(8)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                .padding(.horizontal, 5)
+            }
+        }
+    }
+    
+    private var expiryDateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter
+    }
+    
+    private func isExpiryClose(date: Date) -> Bool {
+        let threeMonthsFromNow = Calendar.current.date(byAdding: .month, value: 3, to: Date()) ?? Date()
+        return date < threeMonthsFromNow
     }
 }
 
@@ -302,87 +444,8 @@ struct PharmacyInfoView: View {
     }
 }
 
-struct PharmacyMedicationsView: View {
-    let medications: [Medication]
-    
-    var body: some View {
-        if medications.isEmpty {
-            Text("Satılık ilaç bulunmuyor.")
-                .foregroundColor(.gray)
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .center)
-        } else {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 15) {
-                    ForEach(medications) { medication in
-                        VStack(alignment: .leading, spacing: 5) {
-                            HStack {
-                                Text(medication.name)
-                                    .font(.headline)
-                                    .foregroundColor(Color(red: 0.3, green: 0.4, blue: 0.3))
-                                
-                                Spacer()
-                                
-                                if medication.status == .forSale {
-                                    Text(medication.status.rawValue)
-                                        .font(.caption)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 3)
-                                        .background(Color(red: 0.85, green: 0.5, blue: 0.2))
-                                        .foregroundColor(.white)
-                                        .cornerRadius(10)
-                                }
-                            }
-                            
-                            Text(medication.description)
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                            
-                            if let expiryDate = medication.expiryDate {
-                                Text("SKT: \(expiryDateFormatter.string(from: expiryDate))")
-                                    .font(.caption)
-                                    .foregroundColor(isExpiryClose(date: expiryDate) ? .red : .gray)
-                            }
-                            
-                            HStack {
-                                Text("\(String(format: "%.2f", medication.price)) TL")
-                                    .fontWeight(.medium)
-                                
-                                Spacer()
-                                
-                                Text("Stok: \(medication.quantity)")
-                                    .font(.caption)
-                                    .padding(5)
-                                    .background(Color(red: 0.85, green: 0.9, blue: 0.85))
-                                    .cornerRadius(5)
-                            }
-                        }
-                        .padding(10)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
-                    }
-                }
-                .padding(.horizontal, 5)
-            }
-        }
-    }
-    
-    private var expiryDateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter
-    }
-    
-    private func isExpiryClose(date: Date) -> Bool {
-        let threeMonthsFromNow = Calendar.current.date(byAdding: .month, value: 3, to: Date()) ?? Date()
-        return date < threeMonthsFromNow
-    }
-}
-
 #Preview {
     NavigationView {
-        HomeView()
+        HomeView(showAddMedicationSheet: .constant(false))
     }
 } 

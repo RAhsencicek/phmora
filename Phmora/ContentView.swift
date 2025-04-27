@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 // Ana görünüm yönetimi için enum
 enum AuthScreen {
@@ -25,8 +26,6 @@ struct ContentView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 200, height: 200)
-                    
-                    
                 }
                 .padding(.top, 50)
                 
@@ -56,20 +55,21 @@ struct ContentView: View {
 
 // Giriş ekranı
 struct LoginView: View {
-    @State private var kimlikNo = ""
-    @State private var password = ""
-    @State private var showingAlert = false
-    @State private var isLoading = false
+    @StateObject private var viewModel = LoginViewModel()
+    @State private var showMainView = false
     
     var body: some View {
         VStack(spacing: 20) {
             // Giriş formu
             VStack(spacing: 15) {
-                TextField("Eczacı Kimlik No", text: $kimlikNo)
+                TextField("Email", text: $viewModel.email)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocapitalization(.none)
+                    .disabled(viewModel.isLoading)
                 
-                SecureField("Şifre", text: $password)
+                SecureField("Şifre", text: $viewModel.password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .disabled(viewModel.isLoading)
                 
                 Button("Şifremi Unuttum") {
                     // Şifre sıfırlama işlemi
@@ -81,18 +81,9 @@ struct LoginView: View {
             .padding(.horizontal)
             
             // Giriş butonu
-            Button(action: {
-                withAnimation {
-                    isLoading = true
-                    // Giriş işlemi simülasyonu
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        isLoading = false
-                        showingAlert = true
-                    }
-                }
-            }) {
+            Button(action: viewModel.login) {
                 HStack {
-                    if isLoading {
+                    if viewModel.isLoading {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             .padding(.trailing, 5)
@@ -106,16 +97,68 @@ struct LoginView: View {
                 .cornerRadius(10)
             }
             .padding(.horizontal)
-            .disabled(isLoading)
+            .disabled(viewModel.isLoading)
+            
+            if !viewModel.errorMessage.isEmpty {
+                Text(viewModel.errorMessage)
+                    .foregroundColor(.red)
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.red.opacity(0.1))
+                    )
+                    .padding(.horizontal)
+            }
             
             Spacer()
         }
         .padding(.top, 30)
-        .alert("Başarılı", isPresented: $showingAlert) {
-            Button("Tamam", role: .cancel) {}
-        } message: {
-            Text("Giriş başarılı!")
+        .fullScreenCover(isPresented: $viewModel.isLoggedIn) {
+            MainView()
         }
+    }
+}
+
+class LoginViewModel: ObservableObject {
+    @Published var email = ""
+    @Published var password = ""
+    @Published var isLoading = false
+    @Published var errorMessage = ""
+    @Published var isLoggedIn = false
+    
+    private var cancellables = Set<AnyCancellable>()
+    
+    func login() {
+        guard !email.isEmpty && !password.isEmpty else {
+            errorMessage = "Lütfen e-posta ve şifrenizi girin"
+            return
+        }
+        
+        isLoading = true
+        errorMessage = ""
+        
+        AuthService.shared.login(email: email, password: password)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { [weak self] (completion: Subscribers.Completion<Error>) in
+                self?.isLoading = false
+                
+                switch completion {
+                case .failure(let error):
+                    if let apiError = error as? APIError {
+                        self?.errorMessage = apiError.errorDescription ?? "Bilinmeyen bir hata oluştu"
+                    } else {
+                        self?.errorMessage = error.localizedDescription
+                    }
+                    self?.isLoggedIn = false
+                case .finished:
+                    break
+                }
+            }, receiveValue: { [weak self] (response: LoginResponse) in
+                self?.isLoggedIn = true
+                self?.errorMessage = ""
+                UserDefaults.standard.set(response.token, forKey: "userToken")
+            })
+            .store(in: &cancellables)
     }
 }
 

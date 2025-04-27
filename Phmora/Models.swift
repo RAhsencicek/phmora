@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import Foundation
 
 struct Pharmacy: Identifiable {
     var id = UUID()
@@ -10,20 +11,60 @@ struct Pharmacy: Identifiable {
     var availableMedications: [Medication]
 }
 
-struct Medication: Identifiable {
-    var id = UUID()
+// Medication Models
+enum MedicationStatus: String, Codable, CaseIterable {
+    case available = "Mevcut"
+    case forSale = "Satılık"
+    case reserved = "Rezerve"
+    case sold = "Satıldı"
+}
+
+struct Medication: Identifiable, Codable {
+    let id = UUID()
     let name: String
     let description: String
     let price: Double
     let quantity: Int
     let expiryDate: Date?
-    let imageURL: String?
+    let imageURL: URL?
     let status: MedicationStatus
 }
 
-enum MedicationStatus: String, CaseIterable {
-    case available = "Mevcut"
-    case forSale = "Satılık"
-    case reserved = "Rezerve"
-    case sold = "Satıldı"
+// Auth Models
+struct LoginRequest: Codable {
+    let email: String
+    let password: String
+}
+
+struct LoginResponse: Codable {
+    let message: String
+    let token: String
+    let user: UserResponse
+}
+
+struct UserResponse: Codable {
+    let id: String
+    let pharmacistId: String
+    let name: String
+    let email: String
+    let role: String
+}
+
+struct APIError: LocalizedError, Codable {
+    let message: String?
+    let errors: [ValidationError]?
+    
+    var errorDescription: String? {
+        if let validationErrors = errors {
+            return validationErrors.map { $0.msg }.joined(separator: "\n")
+        }
+        return message ?? "Bilinmeyen bir hata oluştu"
+    }
+}
+
+struct ValidationError: Codable {
+    let type: String
+    let msg: String
+    let path: String
+    let location: String
 } 

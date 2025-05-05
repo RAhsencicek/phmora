@@ -20,6 +20,8 @@ struct ProfileView: View {
                         .scaledToFit()
                         .frame(width: 100, height: 100)
                         .foregroundColor(Color(red: 0.4, green: 0.5, blue: 0.4))
+                        .background(Circle().fill(Color.white))
+                        .shadow(color: .gray.opacity(0.3), radius: 5)
                     
                     VStack(spacing: 5) {
                         Text(name)
@@ -41,10 +43,13 @@ struct ProfileView: View {
                     
                     VStack(spacing: 0) {
                         profileRow(icon: "envelope", title: "E-posta", detail: email)
+                            .padding(.vertical, 12)
                         Divider().padding(.leading, 50)
                         profileRow(icon: "phone", title: "Telefon", detail: phone)
+                            .padding(.vertical, 12)
                         Divider().padding(.leading, 50)
                         profileRow(icon: "location", title: "Adres", detail: address)
+                            .padding(.vertical, 12)
                     }
                     .background(Color.white)
                     .cornerRadius(12)

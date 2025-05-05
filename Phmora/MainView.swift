@@ -1,10 +1,7 @@
 import SwiftUI
 
 enum MainTab {
-    case home
-    case search
-    case profile
-    case notifications
+    case home, search, profile, notifications
 }
 
 struct MainView: View {
@@ -45,6 +42,8 @@ struct MainView: View {
             }
             .tag(MainTab.notifications)
         }
+        .accentColor(Color(red: 0.4, green: 0.5, blue: 0.4))  // Tab bar seçili rengi
+        .tint(Color(red: 0.4, green: 0.5, blue: 0.4))  // iOS 15+ için
         .sheet(isPresented: $showAddMedicationSheet) {
             AddMedicationView { newMedication in
                 // İlaç ekleme işlemi

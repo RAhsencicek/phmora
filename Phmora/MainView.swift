@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum MainTab {
-    case home, search, profile, notifications
+    case home, search, fdaSearch, profile, notifications
 }
 
 struct MainView: View {
@@ -25,6 +25,14 @@ struct MainView: View {
                 Label("Arama", systemImage: "magnifyingglass")
             }
             .tag(MainTab.search)
+            
+            NavigationView {
+                FDADrugSearchView()
+            }
+            .tabItem {
+                Label("FDA", systemImage: "pill.fill")
+            }
+            .tag(MainTab.fdaSearch)
             
             NavigationView {
                 ProfileView()

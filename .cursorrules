@@ -1,0 +1,38 @@
+Pharmora iOS Development Guidelines
+📱 Platform Requirements
+iOS 18.4, Swift 6.0, Xcode 16.3
+Architecture: MVVM with SwiftData
+State Management: @Observable, @Model, @Environment, @StateObject
+Async operations using async/await, network requests via URLSession (no third-party libraries)
+
+📦 Code Requirements
+All modules must be testable and maintainable
+Static screens will be replaced with API-driven views without breaking current login functionality
+Existing structure should be respected while enhancing UI
+
+🎨 UI/UX Design
+Visuals must stay minimalistic and modern
+Font: System default (SF Pro), scalable with Dynamic Type
+Light & Dark mode support is mandatory
+Use soft blue, white, and gray tones to reflect trust and cleanliness
+Button targets: minimum 44x44pt for accessibility
+
+🧩 Core Screens
+Home screen: Dashboard showing latest offers and activities
+Drug Listing: Filterable, editable list with visual thumbnails
+Add Drug: Form with name, description, expiry date, photo, and price
+Map: Real-time eczane locations and stock visualization using Google Maps SDK
+Offers & Transactions: Send, receive, track offers, with secure purchase workflow
+Admin & Reports: For monitoring activity and compliance
+🔐 Security
+Auto session expiration
+Strong password policy
+SSL encrypted API communication
+
+🧠 Bonus Recommendations
+Use #Preview macros for each screen
+Include mock data models for UI previews
+Structure API layer with a service protocol pattern, e.g.:
+protocol NetworkService {
+    func fetchDrugs() async throws -> [Drug]
+}

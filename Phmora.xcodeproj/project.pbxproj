@@ -29,9 +29,22 @@
 		043C466D2D922CDD00F2AF70 /* PhmoraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhmoraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		560B5D2D2DD07A0700E93726 /* Exceptions for "Phmora" folder in "Phmora" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 043C46522D922CDC00F2AF70 /* Phmora */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		043C46552D922CDC00F2AF70 /* Phmora */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				560B5D2D2DD07A0700E93726 /* Exceptions for "Phmora" folder in "Phmora" target */,
+			);
 			path = Phmora;
 			sourceTree = "<group>";
 		};

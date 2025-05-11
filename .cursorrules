@@ -36,3 +36,5 @@ Structure API layer with a service protocol pattern, e.g.:
 protocol NetworkService {
     func fetchDrugs() async throws -> [Drug]
 }
+
+Tüm işlemlerde Apple'ın swiftin veya kullandığımız tüm teknolojilerin son sürümlerine göre hareket et. Bu kısım çok önemli.

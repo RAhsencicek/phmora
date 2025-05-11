@@ -40,6 +40,57 @@ struct HomeView: View {
     @State private var selectedPharmacy: Pharmacy? = nil
     @State private var showPharmacyDetails = false
     @State private var currentUserPharmacyIndex = 0 // Kullanıcının kendi eczanesinin indeksi
+    @State private var selectedView: MapViewType = .pharmacies
+    
+    enum MapViewType {
+        case pharmacies, dutyPharmacies
+    }
+    
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            // View Seçici
+            VStack {
+                Picker("Görünüm", selection: $selectedView) {
+                    Text("İlaç Satışları").tag(MapViewType.pharmacies)
+                    Text("Nöbetçi Eczaneler").tag(MapViewType.dutyPharmacies)
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                .padding(.top, 8)
+                
+                // İçerik
+                if selectedView == .pharmacies {
+                    // İlaç Satışları
+                    PharmaciesMapView(
+                        pharmacies: pharmacies,
+                        selectedPharmacy: $selectedPharmacy,
+                        showPharmacyDetails: $showPharmacyDetails,
+                        showAddMedicationSheet: $showAddMedicationSheet
+                    )
+                } else {
+                    // Nöbetçi Eczaneler
+                    DutyPharmacyView()
+                }
+            }
+        }
+        .sheet(isPresented: $showPharmacyDetails, onDismiss: {
+            selectedPharmacy = nil
+        }) {
+            if let pharmacy = selectedPharmacy {
+                PharmacyDetailView(pharmacy: pharmacy)
+                    .presentationDetents([.height(200), .medium, .large])
+                    .presentationDragIndicator(.visible)
+            }
+        }
+        .navigationTitle(selectedView == .pharmacies ? "Eczaneler" : "Nöbetçi Eczaneler")
+    }
+}
+
+struct PharmaciesMapView: View {
+    let pharmacies: [Pharmacy]
+    @Binding var selectedPharmacy: Pharmacy?
+    @Binding var showPharmacyDetails: Bool
+    @Binding var showAddMedicationSheet: Bool
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -95,16 +146,6 @@ struct HomeView: View {
             }
             .padding()
         }
-        .sheet(isPresented: $showPharmacyDetails, onDismiss: {
-            selectedPharmacy = nil
-        }) {
-            if let pharmacy = selectedPharmacy {
-                PharmacyDetailView(pharmacy: pharmacy)
-                    .presentationDetents([.height(200), .medium, .large])
-                    .presentationDragIndicator(.visible)
-            }
-        }
-        .navigationTitle("Eczaneler")
     }
 }
 

@@ -4,7 +4,7 @@ import Combine
 import Observation
 
 struct DutyPharmacyView: View {
-    @State private var viewModel = DutyPharmacyViewModel()
+    @StateObject private var viewModel = DutyPharmacyViewModel()
     @State private var selectedPharmacy: DutyPharmacy?
     @State private var showPharmacyDetails = false
     @State private var showingLocationPermissionAlert = false
@@ -15,79 +15,18 @@ struct DutyPharmacyView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Harita görünümü
-            Map(initialPosition: .region(mapRegion)) {
-                ForEach(viewModel.dutyPharmacies) { pharmacy in
-                    Marker(coordinate: pharmacy.coordinate) {
-                        ZStack {
-                            Circle()
-                                .fill(.white)
-                                .frame(width: 40, height: 40)
-                                .shadow(radius: 2)
-                            
-                            Image(systemName: "cross.fill")
-                                .resizable()
-                                .frame(width: 22, height: 22)
-                                .foregroundColor(Color.red)
-                        }
-                    }
-                    .tag(pharmacy)
-                    .annotationTitles(.hidden)
-                }
-                
-                UserAnnotation()
-            }
-            .mapStyle(.standard)
-            .mapControls {
-                MapCompass()
-                MapUserLocationButton()
-                MapScaleView()
-            }
-            .onTapGesture { location in
-                guard let pharmacy = viewModel.dutyPharmacies.first(where: { marker in
-                    // Basit bir mesafe hesabı
-                    let mapLocation = location
-                    let pharmacyLocation = MKMapPoint(pharmacy.coordinate)
-                    return MKMapPoint.distance(mapLocation, pharmacyLocation) < 30000 // Piksel bazlı
-                }) else { return }
-                
-                selectedPharmacy = pharmacy
-                showPharmacyDetails = true
-            }
+            // Harita görünümü - Karmaşık ifadeyi basitleştirdim
+            mapView
             
             // Durum ve bilgi görünümü
-            VStack {
-                // Durum bilgisi
-                if viewModel.isLoading {
-                    LoadingView(text: "Nöbetçi eczaneler aranıyor...")
-                        .padding(.bottom, 10)
-                } else if let error = viewModel.error {
-                    ErrorView(message: error.localizedDescription) {
-                        viewModel.findNearbyPharmacies()
-                    }
-                    .padding(.bottom, 10)
-                } else if viewModel.dutyPharmacies.isEmpty {
-                    InformationView(message: "Yakınınızda nöbetçi eczane bulunamadı")
-                        .padding(.bottom, 10)
-                }
-            }
-            .padding()
+            statusView
             
             // Konum izni isteme yönetimi
-            if viewModel.showLocationPermissionAlert {
-                VStack {
-                    Spacer()
-                    
-                    LocationPermissionView(viewModel: viewModel)
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(12)
-                        .shadow(radius: 4)
-                        .padding(.horizontal)
-                        .padding(.bottom, 20)
-                }
-                .transition(.move(edge: .bottom))
-                .animation(.easeInOut, value: viewModel.showLocationPermissionAlert)
+            locationPermissionView
+            
+            // Eczane listesi
+            if !viewModel.dutyPharmacies.isEmpty {
+                pharmacyListButton
             }
         }
         .sheet(isPresented: $showPharmacyDetails, onDismiss: {
@@ -102,7 +41,7 @@ struct DutyPharmacyView: View {
         .onAppear {
             viewModel.checkLocationPermission()
         }
-        .onChange(of: viewModel.location) { _, newLocation in
+        .onChange(of: viewModel.location) { newLocation in
             if let newLocation = newLocation {
                 // Konum değiştiğinde harita merkezini güncelle
                 mapRegion = MKCoordinateRegion(
@@ -121,7 +60,7 @@ struct DutyPharmacyView: View {
         } message: {
             Text("Nöbetçi eczaneleri görebilmek için 'Ayarlar > Gizlilik ve Güvenlik > Konum Servisleri > Pharmora' yolunu izleyerek 'Uygulamayı kullanırken' seçeneğini seçin.")
         }
-        .onChange(of: viewModel.showLocationPermissionAlert) { _, shouldShow in
+        .onChange(of: viewModel.showLocationPermissionAlert) { shouldShow in
             if shouldShow {
                 // SwiftUI alert kullanımı için ayrı bir state değişkeni
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -131,16 +70,104 @@ struct DutyPharmacyView: View {
         }
         .navigationTitle("Nöbetçi Eczaneler")
     }
+    
+    // MARK: - Alt görünümler
+    
+    // Harita görünümünü ayrı bir hesaplanmış özellik olarak tanımladım
+    private var mapView: some View {
+        Map(coordinateRegion: .constant(mapRegion), annotationItems: viewModel.dutyPharmacies) { pharmacy in
+            MapMarker(coordinate: pharmacy.coordinate, tint: .red)
+        }
+        .mapStyle(.standard)
+        .mapControls {
+            MapCompass()
+            MapUserLocationButton()
+            MapScaleView()
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            // Harita üzerindeki genel dokunma işlemine yanıt vermek için
+            // kullanılabilir ama şu an için boş bırakalım
+        }
+    }
+    
+    // Durum bilgisi görünümü
+    private var statusView: some View {
+        VStack {
+            // Durum bilgisi
+            if viewModel.isLoading {
+                LoadingView(text: "Nöbetçi eczaneler aranıyor...")
+                    .padding(.bottom, 10)
+            } else if let error = viewModel.error {
+                ErrorView(message: error.localizedDescription) {
+                    viewModel.findNearbyPharmacies()
+                }
+                .padding(.bottom, 10)
+            } else if viewModel.dutyPharmacies.isEmpty {
+                InformationView(message: "Yakınınızda nöbetçi eczane bulunamadı")
+                    .padding(.bottom, 10)
+            }
+        }
+        .padding()
+    }
+    
+    // Konum izni görünümü
+    private var locationPermissionView: some View {
+        Group {
+            if viewModel.showLocationPermissionAlert {
+                VStack {
+                    Spacer()
+                    
+                    LocationPermissionView(viewModel: viewModel)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(12)
+                        .shadow(radius: 4)
+                        .padding(.horizontal)
+                        .padding(.bottom, 20)
+                }
+                .transition(.move(edge: .bottom))
+                .animation(.easeInOut, value: viewModel.showLocationPermissionAlert)
+            }
+        }
+    }
+    
+    // Eczane listesi görünümü için buton
+    private var pharmacyListButton: some View {
+        VStack {
+            Spacer()
+            
+            Button(action: {
+                showPharmacyDetails = true
+                if !viewModel.dutyPharmacies.isEmpty {
+                    selectedPharmacy = viewModel.dutyPharmacies.first
+                }
+            }) {
+                HStack {
+                    Image(systemName: "list.bullet")
+                    Text("Nöbetçi Eczaneleri Görüntüle")
+                    Image(systemName: "chevron.right")
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color.white)
+                .foregroundColor(.blue)
+                .cornerRadius(12)
+                .shadow(radius: 2)
+                .padding()
+            }
+        }
+    }
 }
 
 // ViewModel
-@Observable
-class DutyPharmacyViewModel {
-    var dutyPharmacies: [DutyPharmacy] = []
-    var isLoading = false
-    var error: Error?
-    var location: CLLocation?
-    var showLocationPermissionAlert = false
+@MainActor
+class DutyPharmacyViewModel: ObservableObject {
+    @Published var dutyPharmacies: [DutyPharmacy] = []
+    @Published var isLoading = false
+    @Published var error: Error?
+    @Published var location: CLLocation?
+    @Published var showLocationPermissionAlert = false
     
     private let locationManager = LocationManager()
     private var cancellables = Set<AnyCancellable>()
@@ -150,45 +177,43 @@ class DutyPharmacyViewModel {
     }
     
     private func setupSubscriptions() {
-        // iOS 18'de @Observable ile değişkenleri dinleme
-        Task {
-            // @Observable değişikliklerini dinle (iOS 18.4)
-            for await _ in Observation.Notifications.updates(for: locationManager) {
-                await MainActor.run {
-                    handleAuthorizationStatus(locationManager.authorizationStatus)
-                    
-                    // Konum veya hata değişimini kontrol et
-                    if let location = locationManager.location {
-                        self.location = location
-                        findNearbyPharmacies()
-                    }
-                    
-                    if let error = locationManager.error {
-                        self.error = error
-                        self.isLoading = false
-                    }
-                }
+        // Konum yöneticisinden gelen değişiklikleri dinle
+        locationManager.$authorizationStatus
+            .sink { [weak self] status in
+                self?.handleAuthorizationStatus(status)
             }
-        }
+            .store(in: &cancellables)
+        
+        locationManager.$location
+            .compactMap { $0 }
+            .sink { [weak self] location in
+                self?.location = location
+                self?.findNearbyPharmacies()
+            }
+            .store(in: &cancellables)
+        
+        locationManager.$error
+            .compactMap { $0 }
+            .sink { [weak self] error in
+                self?.error = error
+                self?.isLoading = false
+            }
+            .store(in: &cancellables)
     }
     
     // Konum iznini kontrol et
     func checkLocationPermission() {
-        Task { @MainActor in
-            if locationManager.isAuthorized {
-                locationManager.requestLocation()
-            } else {
-                showLocationPermissionAlert = true
-            }
+        if locationManager.isAuthorized {
+            locationManager.requestLocation()
+        } else {
+            showLocationPermissionAlert = true
         }
     }
     
     // Konum izni iste
     func requestLocationPermission() {
-        Task { @MainActor in
-            locationManager.requestLocationPermission()
-            showLocationPermissionAlert = false
-        }
+        locationManager.requestLocationPermission()
+        showLocationPermissionAlert = false
     }
     
     // Konum izni durumunu yönet
@@ -222,15 +247,11 @@ class DutyPharmacyViewModel {
                     longitude: location.coordinate.longitude
                 )
                 
-                await MainActor.run {
-                    self.dutyPharmacies = pharmacies
-                    self.isLoading = false
-                }
+                self.dutyPharmacies = pharmacies
+                self.isLoading = false
             } catch {
-                await MainActor.run {
-                    self.error = error
-                    self.isLoading = false
-                }
+                self.error = error
+                self.isLoading = false
             }
         }
     }

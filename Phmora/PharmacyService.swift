@@ -14,7 +14,7 @@ struct DutyPharmacyResponse: Codable {
     let data: [DutyPharmacy]
 }
 
-struct DutyPharmacy: Codable, Identifiable {
+struct DutyPharmacy: Codable, Identifiable, Hashable {
     let pharmacyID: Int
     let pharmacyName: String
     let address: String
@@ -66,6 +66,16 @@ struct DutyPharmacy: Codable, Identifiable {
         guard let start = dutyStartDate, let end = dutyEndDate else { return false }
         let now = Date()
         return now >= start && now <= end
+    }
+    
+    // Hashable protokolü için gerekli
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(pharmacyID)
+    }
+    
+    // Eşitlik kontrolü
+    static func == (lhs: DutyPharmacy, rhs: DutyPharmacy) -> Bool {
+        return lhs.pharmacyID == rhs.pharmacyID
     }
 }
 

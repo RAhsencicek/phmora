@@ -2,15 +2,14 @@ import Foundation
 import CoreLocation
 import Combine
 
-@Observable
-class LocationManager: NSObject {
+class LocationManager: NSObject, ObservableObject {
     // CLLocationManager nesnesi
     private let locationManager = CLLocationManager()
     
     // Yayınlanan değerler
-    var authorizationStatus: CLAuthorizationStatus = .notDetermined
-    var location: CLLocation?
-    var error: Error?
+    @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    @Published var location: CLLocation?
+    @Published var error: Error?
     
     // Konum servisi durumunu kontrol et
     var isLocationServicesEnabled: Bool {

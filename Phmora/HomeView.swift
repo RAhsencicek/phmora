@@ -3,37 +3,56 @@ import MapKit
 
 struct HomeView: View {
     @Binding var showAddMedicationSheet: Bool
+    @StateObject private var locationManager = LocationManager()
+    @State private var mapRegion = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 38.6748, longitude: 39.2225), // Elazığ merkez koordinatları
+        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+    )
     
     @State private var pharmacies: [Pharmacy] = [
         Pharmacy(
             name: "Merkez Eczanesi",
-            address: "İstiklal Cad. No:123, Beyoğlu",
-            phone: "0212 123 4567",
-            coordinate: CLLocationCoordinate2D(latitude: 41.0112, longitude: 28.9762),
+            address: "Çarşı Mah. Gazi Cad. No:84, Merkez/Elazığ",
+            phone: "0424 218 1001",
+            coordinate: CLLocationCoordinate2D(latitude: 38.6741, longitude: 39.2237),
             availableMedications: [
                 Medication(name: "Parol", description: "Ağrı kesici", price: 25.90, quantity: 10, expiryDate: Calendar.current.date(byAdding: .month, value: 6, to: Date()), imageURL: nil, status: .forSale),
                 Medication(name: "Majezik", description: "Ağrı kesici", price: 32.50, quantity: 15, expiryDate: Calendar.current.date(byAdding: .month, value: 8, to: Date()), imageURL: nil, status: .forSale)
             ]
         ),
         Pharmacy(
-            name: "Hayat Eczanesi",
-            address: "Bağdat Cad. No:45, Kadıköy",
-            phone: "0216 987 6543",
-            coordinate: CLLocationCoordinate2D(latitude: 41.0052, longitude: 28.9804),
+            name: "Fırat Eczanesi",
+            address: "İzzetpaşa Mah. Şehit Polis M.Fevzi Yalçın Cad. No:14/C, Merkez/Elazığ",
+            phone: "0424 237 8787",
+            coordinate: CLLocationCoordinate2D(latitude: 38.6728, longitude: 39.2198),
             availableMedications: [
                 Medication(name: "Aspirin", description: "Ağrı kesici", price: 18.75, quantity: 20, expiryDate: Calendar.current.date(byAdding: .month, value: 3, to: Date()), imageURL: nil, status: .forSale),
                 Medication(name: "B12 Vitamini", description: "Vitamin takviyesi", price: 45.90, quantity: 8, expiryDate: Calendar.current.date(byAdding: .month, value: 12, to: Date()), imageURL: nil, status: .available)
             ]
         ),
         Pharmacy(
-            name: "Güneş Eczanesi",
-            address: "Moda Cad. No:78, Kadıköy",
-            phone: "0216 345 6789",
-            coordinate: CLLocationCoordinate2D(latitude: 41.0102, longitude: 28.9704),
+            name: "Yıldız Eczanesi",
+            address: "Rızaiye Mah. Şehit Polis Ali Gaffar Okkan Cad. No:38/A, Merkez/Elazığ",
+            phone: "0424 238 3434",
+            coordinate: CLLocationCoordinate2D(latitude: 38.6756, longitude: 39.2256),
             availableMedications: [
                 Medication(name: "Augmentin", description: "Antibiyotik", price: 65.30, quantity: 5, expiryDate: Calendar.current.date(byAdding: .month, value: 2, to: Date()), imageURL: nil, status: .forSale),
                 Medication(name: "Zinc", description: "Mineral takviyesi", price: 38.25, quantity: 12, expiryDate: Calendar.current.date(byAdding: .month, value: 10, to: Date()), imageURL: nil, status: .available)
             ]
+        ),
+        Pharmacy(
+            name: "Sağlık Eczanesi",
+            address: "Cumhuriyet Mah. Malatya Cad. No:78/B, Merkez/Elazığ",
+            phone: "0424 233 1212",
+            coordinate: CLLocationCoordinate2D(latitude: 38.6734, longitude: 39.2211),
+            availableMedications: []
+        ),
+        Pharmacy(
+            name: "Şifa Eczanesi",
+            address: "Olgunlar Mah. Gazi Cad. No:132/A, Merkez/Elazığ",
+            phone: "0424 218 5656",
+            coordinate: CLLocationCoordinate2D(latitude: 38.6747, longitude: 39.2242),
+            availableMedications: []
         )
     ]
     
@@ -48,7 +67,6 @@ struct HomeView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            // View Seçici
             VStack {
                 Picker("Görünüm", selection: $selectedView) {
                     Text("İlaç Satışları").tag(MapViewType.pharmacies)
@@ -58,17 +76,15 @@ struct HomeView: View {
                 .padding(.horizontal)
                 .padding(.top, 8)
                 
-                // İçerik
                 if selectedView == .pharmacies {
-                    // İlaç Satışları
                     PharmaciesMapView(
                         pharmacies: pharmacies,
                         selectedPharmacy: $selectedPharmacy,
                         showPharmacyDetails: $showPharmacyDetails,
-                        showAddMedicationSheet: $showAddMedicationSheet
+                        showAddMedicationSheet: $showAddMedicationSheet,
+                        region: $mapRegion
                     )
                 } else {
-                    // Nöbetçi Eczaneler
                     DutyPharmacyView()
                 }
             }
@@ -83,6 +99,17 @@ struct HomeView: View {
             }
         }
         .navigationTitle(selectedView == .pharmacies ? "Eczaneler" : "Nöbetçi Eczaneler")
+        .onAppear {
+            locationManager.requestLocationPermission()
+        }
+        .onChange(of: locationManager.location) { newLocation in
+            if let location = newLocation {
+                mapRegion = MKCoordinateRegion(
+                    center: location.coordinate,
+                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                )
+            }
+        }
     }
 }
 
@@ -91,60 +118,81 @@ struct PharmaciesMapView: View {
     @Binding var selectedPharmacy: Pharmacy?
     @Binding var showPharmacyDetails: Bool
     @Binding var showAddMedicationSheet: Bool
+    @Binding var region: MKCoordinateRegion
+    @State private var selectedAnnotation: Pharmacy?
+    @State private var showingPulse = false
     
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            Map(coordinateRegion: .constant(MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: 41.0082, longitude: 28.9784),
-                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-            )), annotationItems: pharmacies) { pharmacy in
-                MapAnnotation(coordinate: pharmacy.coordinate) {
-                    Button(action: {
+        Map(coordinateRegion: $region,
+            showsUserLocation: true,
+            userTrackingMode: .constant(.follow),
+            annotationItems: pharmacies) { pharmacy in
+            MapAnnotation(coordinate: pharmacy.coordinate) {
+                Button(action: {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         selectedPharmacy = pharmacy
+                        selectedAnnotation = pharmacy
                         showPharmacyDetails = true
-                    }) {
-                        VStack {
-                            ZStack {
-                                Circle()
-                                    .fill(.white)
-                                    .frame(width: 40, height: 40)
-                                    .shadow(radius: 2)
-                                
-                                Image(systemName: "cross.fill")
-                                    .resizable()
-                                    .frame(width: 22, height: 22)
-                                    .foregroundColor(Color(red: 0.4, green: 0.5, blue: 0.4))
-                            }
+                    }
+                }) {
+                    VStack {
+                        ZStack {
+                            // Arka plan dairesi
+                            Circle()
+                                .fill(.white)
+                                .frame(width: 44, height: 44)
+                                .shadow(radius: 2)
                             
-                            if pharmacy.availableMedications.contains(where: { $0.status == .forSale }) {
-                                Text("\(pharmacy.availableMedications.filter { $0.status == .forSale }.count)")
-                                    .font(.caption)
-                                    .padding(4)
-                                    .background(Color(red: 0.85, green: 0.5, blue: 0.2))
-                                    .foregroundColor(.white)
-                                    .clipShape(Circle())
-                                    .offset(y: -5)
+                            // Eczane ikonu
+                            Image(systemName: "cross.circle.fill")
+                                .resizable()
+                                .frame(width: 28, height: 28)
+                                .foregroundColor(Color(red: 0.4, green: 0.5, blue: 0.4))
+                            
+                            // Seçili durum için animasyonlu halka
+                            if selectedAnnotation == pharmacy {
+                                Circle()
+                                    .stroke(Color(red: 0.4, green: 0.5, blue: 0.4), lineWidth: 2)
+                                    .frame(width: 50, height: 50)
+                                    .scaleEffect(showingPulse ? 1.3 : 1.0)
+                                    .opacity(showingPulse ? 0 : 1)
+                                    .animation(.easeInOut(duration: 1).repeatForever(autoreverses: false), value: showingPulse)
+                                    .onAppear {
+                                        showingPulse = true
+                                    }
                             }
                         }
+                        
+                        // İlaç sayısı göstergesi
+                        if pharmacy.availableMedications.contains(where: { $0.status == .forSale }) {
+                            Text("\(pharmacy.availableMedications.filter { $0.status == .forSale }.count)")
+                                .font(.caption)
+                                .padding(6)
+                                .background(Color(red: 0.85, green: 0.5, blue: 0.2))
+                                .foregroundColor(.white)
+                                .clipShape(Circle())
+                                .offset(y: -5)
+                        }
+                        
+                        // Eczane adı
+                        Text(pharmacy.name)
+                            .font(.caption)
+                            .foregroundColor(.black)
+                            .padding(4)
+                            .background(.white.opacity(0.9))
+                            .cornerRadius(4)
+                            .shadow(radius: 1)
                     }
+                    .scaleEffect(selectedAnnotation == pharmacy ? 1.1 : 1.0)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selectedAnnotation == pharmacy)
                 }
             }
-            
-            // İlaç Ekle butonu
-            Button(action: {
-                showAddMedicationSheet = true
-            }) {
-                HStack {
-                    Image(systemName: "plus")
-                    Text("İlaç Ekle")
-                }
-                .padding()
-                .background(Color(red: 0.4, green: 0.5, blue: 0.4))
-                .foregroundColor(.white)
-                .cornerRadius(25)
-                .shadow(radius: 3)
-            }
-            .padding()
+        }
+        .mapStyle(.standard)
+        .mapControls {
+            MapCompass()
+            MapUserLocationButton()
+            MapScaleView()
         }
     }
 }

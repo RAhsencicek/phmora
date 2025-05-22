@@ -2,13 +2,17 @@ import SwiftUI
 import MapKit
 import Foundation
 
-struct Pharmacy: Identifiable {
+struct Pharmacy: Identifiable, Equatable {
     var id = UUID()
     let name: String
     let address: String
     let phone: String
     let coordinate: CLLocationCoordinate2D
     var availableMedications: [Medication]
+    
+    static func == (lhs: Pharmacy, rhs: Pharmacy) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
 
 // Medication Models

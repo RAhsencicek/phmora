@@ -1,0 +1,22 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+framework: SwiftUI
+database: Firebase/Firestore
+storage: Firebase/Storage
+authentication: Firebase/Auth
+cloudFunctions: Firebase/Functions
+notifications: Firebase/Messaging
+pattern: MVVM
+minIOSVersion: 18.4.1
+swift: 5.0
+xcode: 16.3
+stateManagement: @Observable, @Environment, @StateObject
+asyncPattern: async/await
+networkLibrary: URLSession
+networkLibrary: Firebase SDK
+mapAPI: GoogleMapsSDK
+language: Swift
+

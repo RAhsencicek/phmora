@@ -7,12 +7,12 @@ Pharmora, eczacılar arasında ilaç değişimini kolaylaştıran, stok yönetim
 ### 🎯 Ana Özellikler
 - ✅ Kullanıcı kimlik doğrulama (giriş/kayıt)
 - ✅ Eczane haritası görünümü
-- ✅ Nöbetçi eczane bulma
 - ✅ İlaç arama (FDA API entegrasyonu)
 - ✅ Profil yönetimi
 - ✅ Bildirimler sistemi
 - 🔄 İlaç satış/satın alma (geliştiriliyor)
 - 🔄 Teklif sistemi (geliştiriliyor)
+- 🔄 Stok yönetimi (geliştiriliyor)
 
 ## 🏗️ Teknik Mimari
 
@@ -41,6 +41,9 @@ Phmora/
 │   │   ├── PharmacyService.swift # Eczane API'leri
 │   │   ├── OpenFDAService.swift # FDA API entegrasyonu
 │   │   └── LocationManager.swift # Konum servisleri
+│   ├── MockData/                # Test veriler
+│   │   ├── PharmacyMockData.swift # Eczane mock veriler (25 eczane)
+│   │   └── FDAMockData.swift    # FDA mock veriler
 │   └── Utils/                   # Yardımcı dosyalar
 │       ├── AppConstants.swift   # Sabit değerler
 │       └── Extensions.swift     # Swift extensions
@@ -48,13 +51,14 @@ Phmora/
 │   ├── Auth/                    # Giriş/Kayıt
 │   │   └── ContentView.swift    # Login/Register UI
 │   ├── Home/                    # Ana ekran
-│   │   ├── HomeView.swift       # Dashboard + Map
+│   │   ├── HomeView.swift       # Dashboard + Map (95 satır)
+│   │   ├── PharmaciesMapView.swift # Harita görünümü
+│   │   ├── PharmacyDetailView.swift # Eczane detayları
 │   │   └── MainView.swift       # Tab navigation
 │   ├── Search/                  # Arama özellikleri
 │   │   ├── SearchView.swift     # İlaç arama
 │   │   └── FDADrugSearchView.swift # FDA arama
 │   ├── Pharmacy/                # Eczane işlemleri
-│   │   ├── DutyPharmacyView.swift # Nöbetçi eczaneler
 │   │   └── AddMedicationView.swift # İlaç ekleme
 │   ├── Profile/                 # Profil yönetimi
 │   ├── Notifications/           # Bildirimler
@@ -74,25 +78,27 @@ Phmora/
 - **Durum**: ✅ Çalışıyor
 
 ### 2. Home Dashboard
-- **Dosya**: `Features/Home/HomeView.swift` (541 satır - refactoring gerekli)
+- **Ana Dosya**: `Features/Home/HomeView.swift` (95 satır - ✅ Refactored)
+- **Destekleyici Dosyalar**:
+  - `PharmaciesMapView.swift` - Harita görünümü
+  - `PharmacyDetailView.swift` - Eczane detayları
 - **Özellikler**:
   - İnteraktif harita görünümü
-  - Eczane annotations
-  - Toggle: Normal eczaneler / Nöbetçi eczaneler
+  - Eczane annotations (25 eczane)
   - Eczane detay sheet'leri
 - **Durum**: ✅ Çalışıyor, Mock veriler kullanılıyor
 
-### 3. Nöbetçi Eczane Sistemi
-- **Dosya**: `Features/Pharmacy/DutyPharmacyView.swift`
-- **API**: Gerçek backend entegrasyonu mevcut
-- **Özellikler**: Konum bazlı arama, harita görünümü
-- **Durum**: ✅ Çalışıyor
-
-### 4. FDA İlaç Arama
+### 3. FDA İlaç Arama
 - **Dosya**: `Features/Search/FDADrugSearchView.swift`
 - **API**: OpenFDA public API
 - **Servis**: `Core/Services/OpenFDAService.swift`
 - **Durum**: ✅ Çalışıyor
+
+### 4. Mock Data System
+- **Eczane Verileri**: `Core/MockData/PharmacyMockData.swift`
+- **FDA Verileri**: `Core/MockData/FDAMockData.swift`
+- **Toplam**: 25 eczane, çeşitli ilaçlar
+- **Durum**: ✅ Modüler yapı
 
 ## 🎨 UI/UX Design System
 
@@ -100,7 +106,7 @@ Phmora/
 ```swift
 // AppConstants.Colors
 static let primary = Color(red: 0.4, green: 0.5, blue: 0.4)     // Yeşil ton
-static let secondary = Color(red: 0.85, green: 0.5, blue: 0.2)  // Turuncu ton
+static let secondary = Color(red: 0.85, green: 0.5, blue: 0.2)  # Turuncu ton
 static let background = Color(red: 0.95, green: 0.97, blue: 0.95) // Açık yeşil
 ```
 
@@ -111,12 +117,12 @@ static let background = Color(red: 0.95, green: 0.97, blue: 0.95) // Açık yeş
 
 ## 🔗 API Entegrasyonları
 
-### 1. Backend API
+### 1. Backend API (Gelecek Özellik)
 - **Base URL**: `https://phamorabackend-production.up.railway.app/api`
-- **Endpoints**:
+- **Planlanan Endpoints**:
   - `POST /auth/login` - Kullanıcı girişi
-  - `GET /pharmacy/nearby` - Yakındaki eczaneler
-  - `GET /pharmacy/list` - Şehir bazlı eczaneler
+  - `GET /pharmacy/medications` - Eczane ilaçları
+  - `POST /offers/send` - Teklif gönderme
 
 ### 2. OpenFDA API
 - **Purpose**: İlaç bilgileri ve yan etkiler
@@ -129,29 +135,29 @@ static let background = Color(red: 0.95, green: 0.97, blue: 0.95) // Açık yeş
 - **UI Tests**: `PhmoraUITests/`
 - **Current Coverage**: Minimal (geliştirme gerekli)
 
-## 🚀 Geliştirme Notları
+## 🚀 Son Yapılan İyileştirmeler
 
-### Öncelikli İyileştirmeler
-1. **HomeView Refactoring**: 541 satır çok büyük, parçalara bölünmeli
-2. **MVVM Consistency**: ViewModel pattern'ı tüm feature'larda tutarlı uygulanmalı
-3. **Error Handling**: Daha kapsamlı hata yönetimi
-4. **Constants Organization**: Hard-coded değerler AppConstants'a taşınmalı
-5. **Documentation**: Tüm public API'ler dokümante edilmeli
+### ✅ Tamamlanan Refactoring
+1. **HomeView Optimizasyonu**: 552 satır → 95 satır (%83 azalma)
+2. **Modüler Yapı**: View'lar ayrı dosyalara taşındı
+3. **Mock Data Organizasyonu**: PharmacyMockData.swift ayrı dosyada
+4. **25 Eczane Eklendi**: Gerçekçi test veriler
+5. **Kod Temizleme**: Unused features kaldırıldı
 
-### Eksik Özellikler
+### 📋 Gelecek İyileştirmeler
 - [ ] Firebase entegrasyonu (Auth, Firestore, Storage)
 - [ ] Push notification sistemi
 - [ ] Gerçek zamanlı veri senkronizasyonu
+- [ ] Offer management sistemi
 - [ ] Admin paneli
 - [ ] Kapsamlı unit testler
 - [ ] Dark mode tam desteği
 - [ ] Accessibility features
 
 ### Bilinen Sorunlar
-- HomeView çok büyük (541 satır)
-- Mock veriler hardcoded
-- MVVM pattern tutarsız
-- Error handling eksik
+- Mock veriler hardcoded (backend entegrasyonu bekliyor)
+- MVVM pattern bazı view'larda tutarsız
+- Error handling bazı yerlerde eksik
 
 ## 📝 Kod Standartları
 

@@ -1,53 +1,88 @@
-# Nöbetçi Eczane Modülü Geliştirmesi
+# Pharmora - Eczaneler Arası İlaç Ticaret Platformu
 
-Bu geliştirme, Pharmora uygulamasına nöbetçi eczane görüntüleme özelliği eklemektedir.
+Pharmora, eczaneler arasında ilaç alım-satımı ve takasını kolaylaştıran modern bir iOS uygulamasıdır.
 
-## Eklenen Özellikler
+## 🎯 Ana Özellikler
 
-- 📍 Konum tabanlı nöbetçi eczane bulma
-- 🗺 Haritada nöbetçi eczaneleri görüntüleme 
-- 🔍 Eczane detaylarını inceleme (ad, adres, telefon, adres tarifi)
-- 🧭 Apple Harita ve Google Harita ile yol tarifi alma
-- 📱 Doğrudan eczaneyi arama
+- 🏥 **Eczane Ağı**: Eczaneleri haritada görüntüleme ve keşfetme
+- 💊 **İlaç Envanteri**: Mevcut ilaçları listeleme ve yönetme
+- 🤝 **Ticaret Sistemi**: Eczaneler arası ilaç alım-satımı
+- 📊 **Stok Yönetimi**: İlaç stoklarını takip etme
+- 🔍 **Arama ve Filtreleme**: İhtiyaç duyulan ilaçları kolayca bulma
+- 📱 **Modern Arayüz**: SwiftUI ile geliştirilmiş kullanıcı dostu tasarım
 
-## Teknik Detaylar
+## 🏗️ Teknik Mimari
 
 ### Katmanlar
 
 1. **PharmacyService**: API isteklerini yöneten servis katmanı
 2. **LocationManager**: Konum izinleri ve konum bilgisi yönetimi
-3. **DutyPharmacyViewModel**: Nöbetçi eczane verilerini ve işlemleri yöneten ViewModel
-4. **DutyPharmacyView**: Nöbetçi eczaneleri gösteren arayüz bileşeni
-5. **DutyPharmacyDetailView**: Eczane detaylarını gösteren arayüz bileşeni
+3. **Models**: Eczane, İlaç ve diğer veri modelleri
+4. **ViewModels**: MVVM mimarisi ile state yönetimi
+5. **Views**: SwiftUI ile geliştirilmiş kullanıcı arayüzleri
 
-### Kullanılan API
+### Teknoloji Stack
 
-Nöbetçi eczane verileri, aşağıdaki API endpointinden alınmaktadır:
-- API URL: `https://phamorabackend-production.up.railway.app/api/pharmacy`
-- Endpointler:
-  - `/nearby`: Yakındaki eczaneleri bulmak için
-  - `/list`: İl ve ilçeye göre eczaneleri listelemek için
+- **Platform**: iOS 18.4+
+- **Dil**: Swift 6.0
+- **Geliştirme Ortamı**: Xcode 16.3
+- **UI Framework**: SwiftUI
+- **Mimari**: MVVM
+- **Async Operations**: Swift Concurrency (async/await)
+- **Harita**: MapKit
+- **Database**: SwiftData (planlanan)
+- **Backend**: Firebase (planlanan)
 
-### Konum İzinleri
+## 📁 Proje Yapısı
 
-Uygulama, kullanıcının konumuna erişebilmek için gerekli izinleri ister. Bu izinler Info.plist dosyasında tanımlanmıştır:
-- `NSLocationWhenInUseUsageDescription`: Uygulama kullanılırken konum erişimi için
-- `NSLocationTemporaryUsageDescriptionDictionary`: Tam konum erişimi için
+```
+Phmora/
+├── App/                          # Ana uygulama dosyaları
+├── Core/                         # Temel bileşenler
+│   ├── Models/                   # Veri modelleri
+│   ├── Services/                 # API servisleri
+│   ├── Utils/                    # Yardımcı sınıflar
+│   └── MockData/                 # Test veriler
+├── Features/                     # Özellik bazlı modüller
+│   ├── Auth/                     # Kimlik doğrulama
+│   ├── Home/                     # Ana sayfa
+│   ├── Search/                   # Arama özellikleri
+│   └── Pharmacy/                 # Eczane yönetimi
+└── Resources/                    # Görseller ve kaynaklar
+```
 
-## Kullanım
+## 🚀 Kurulum ve Çalıştırma
 
-1. Ana ekrandaki segmentli kontrolde "Nöbetçi Eczaneler" seçeneğine tıklayın
-2. İstenirse konum izni verin
-3. Haritada kırmızı ikonlarla gösterilen nöbetçi eczaneleri görüntüleyin
-4. Eczane bilgilerini görmek için eczane ikonuna tıklayın
-5. Detaylar sayfasından yol tarifi alın veya eczaneyi arayın
+1. Projeyi klonlayın:
+```bash
+git clone https://github.com/RAhsencicek/phmora.git
+cd phmora
+```
 
-## Geliştirme ve Test Ortamı
+2. Xcode ile açın:
+```bash
+open Phmora.xcodeproj
+```
 
-- iOS 18.4
-- Swift 6.0
-- Xcode 16.3
-- SwiftUI
-- Swift Concurrency
-- Combine Framework
-- MapKit 
+3. Projeyi çalıştırın (⌘+R)
+
+## 🔮 Gelecek Özellikler
+
+- [ ] Firebase entegrasyonu
+- [ ] Gerçek zamanlı bildirimler
+- [ ] Ödeme sistemi entegrasyonu
+- [ ] Analitik ve raporlama
+- [ ] Admin paneli
+- [ ] Çoklu dil desteği
+
+## 🤝 Katkıda Bulunma
+
+1. Projeyi fork edin
+2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
+4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
+5. Pull Request oluşturun
+
+## 📄 Lisans
+
+Bu proje MIT lisansı altında lisanslanmıştır. 

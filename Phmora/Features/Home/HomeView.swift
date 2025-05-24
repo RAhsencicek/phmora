@@ -2,10 +2,9 @@ import SwiftUI
 import MapKit
 
 // MARK: - Home View
-/// Main dashboard view that displays pharmacies and duty pharmacies on a map
+/// Main dashboard view that displays pharmacies on a map
 /// Features:
 /// - Interactive map with pharmacy annotations
-/// - Toggle between regular pharmacies and duty pharmacies
 /// - Pharmacy detail sheets
 /// - Location-based services
 struct HomeView: View {
@@ -21,37 +20,22 @@ struct HomeView: View {
     @State private var selectedPharmacy: Pharmacy? = nil
     @State private var showPharmacyDetails = false
     @State private var currentUserPharmacyIndex = 0 // Kullanıcının kendi eczanesinin indeksi
-    @State private var selectedView: MapViewType = .pharmacies
     
     // MARK: - Mock Data (TODO: Replace with API data)
     @State private var pharmacies: [Pharmacy] = PharmacyMockData.pharmacies
-    
-    // MARK: - Supporting Types
-    /// Type of map view to display
-    enum MapViewType {
-        case pharmacies      // Regular pharmacy sales
-        case dutyPharmacies  // Duty pharmacies
-    }
     
     // MARK: - Body
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack {
-                // View Toggle
-                viewTogglePicker
-                
                 // Map Content
-                if selectedView == .pharmacies {
-                    PharmaciesMapView(
-                        pharmacies: pharmacies,
-                        selectedPharmacy: $selectedPharmacy,
-                        showPharmacyDetails: $showPharmacyDetails,
-                        showAddMedicationSheet: $showAddMedicationSheet,
-                        region: $mapRegion
-                    )
-                } else {
-                    DutyPharmacyView()
-                }
+                PharmaciesMapView(
+                    pharmacies: pharmacies,
+                    selectedPharmacy: $selectedPharmacy,
+                    showPharmacyDetails: $showPharmacyDetails,
+                    showAddMedicationSheet: $showAddMedicationSheet,
+                    region: $mapRegion
+                )
             }
         }
         .sheet(isPresented: $showPharmacyDetails, onDismiss: {
@@ -63,24 +47,13 @@ struct HomeView: View {
                     .presentationDragIndicator(.visible)
             }
         }
-        .navigationTitle(selectedView == .pharmacies ? "Eczaneler" : "Nöbetçi Eczaneler")
+        .navigationTitle("Eczaneler")
         .onAppear {
             setupView()
         }
         .onChange(of: locationManager.location) { _, newLocation in
             updateMapRegion(with: newLocation)
         }
-    }
-    
-    // MARK: - View Components
-    private var viewTogglePicker: some View {
-        Picker("Görünüm", selection: $selectedView) {
-            Text("İlaç Satışları").tag(MapViewType.pharmacies)
-            Text("Nöbetçi Eczaneler").tag(MapViewType.dutyPharmacies)
-        }
-        .pickerStyle(.segmented)
-        .padding(.horizontal)
-        .padding(.top, 8)
     }
     
     // MARK: - Private Methods

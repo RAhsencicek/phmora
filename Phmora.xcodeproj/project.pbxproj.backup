@@ -29,22 +29,9 @@
 		043C466D2D922CDD00F2AF70 /* PhmoraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhmoraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		04B092A02DE1C26B001EC630 /* Exceptions for "Phmora" folder in "Phmora" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				App/Info.plist,
-			);
-			target = 043C46522D922CDC00F2AF70 /* Phmora */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		043C46552D922CDC00F2AF70 /* Phmora */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				04B092A02DE1C26B001EC630 /* Exceptions for "Phmora" folder in "Phmora" target */,
-			);
 			path = Phmora;
 			sourceTree = "<group>";
 		};
@@ -413,8 +400,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Phmora/Preview Content\"";
 				DEVELOPMENT_TEAM = 3889U3P728;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Phmora/App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -443,8 +429,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Phmora/Preview Content\"";
 				DEVELOPMENT_TEAM = 3889U3P728;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Phmora/App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -470,8 +455,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HN5H3P8HDV;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Phmora/App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.PhmoraTests;
@@ -490,8 +474,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HN5H3P8HDV;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Phmora/App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.PhmoraTests;
@@ -509,8 +492,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HN5H3P8HDV;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Phmora/App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.PhmoraUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -527,8 +509,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HN5H3P8HDV;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Phmora/App/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.PhmoraUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

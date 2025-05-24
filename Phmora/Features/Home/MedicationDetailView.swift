@@ -57,7 +57,7 @@ struct MedicationDetailView: View {
                     .scaledToFit()
                     .frame(height: 200)
                     .frame(maxWidth: .infinity)
-                    .background(Color(red: 0.95, green: 0.97, blue: 0.95))
+                    .background(.regularMaterial)
                     .cornerRadius(10)
             } else {
                 Image(systemName: "pills.fill")
@@ -67,7 +67,7 @@ struct MedicationDetailView: View {
                     .frame(maxWidth: .infinity)
                     .foregroundColor(Color(red: 0.4, green: 0.5, blue: 0.4))
                     .padding()
-                    .background(Color(red: 0.95, green: 0.97, blue: 0.95))
+                    .background(.regularMaterial)
                     .cornerRadius(10)
             }
         }
@@ -118,7 +118,7 @@ struct MedicationDetailView: View {
             }
         }
         .padding()
-        .background(Color.white)
+        .background(.regularMaterial)
         .cornerRadius(10)
     }
     
@@ -143,7 +143,7 @@ struct MedicationDetailView: View {
             }
         }
         .padding()
-        .background(Color.white)
+        .background(.regularMaterial)
         .cornerRadius(10)
     }
     
@@ -155,7 +155,7 @@ struct MedicationDetailView: View {
                 Label("Satın Al", systemImage: "cart")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(red: 0.4, green: 0.5, blue: 0.4))
+                    .background(Color(red: 0.4, green: 0.6, blue: 0.4))
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }
@@ -167,7 +167,7 @@ struct MedicationDetailView: View {
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.gray.opacity(0.2))
-                    .foregroundColor(Color(red: 0.4, green: 0.5, blue: 0.4))
+                    .foregroundColor(Color(red: 0.4, green: 0.6, blue: 0.4))
                     .cornerRadius(10)
             }
         }

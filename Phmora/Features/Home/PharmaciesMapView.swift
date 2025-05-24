@@ -19,7 +19,7 @@ struct PharmaciesMapView: View {
     var body: some View {
         Map(coordinateRegion: $region,
             showsUserLocation: true,
-            userTrackingMode: .constant(.follow),
+            userTrackingMode: .constant(.none),
             annotationItems: pharmacies) { pharmacy in
             MapAnnotation(coordinate: pharmacy.coordinate) {
                 PharmacyAnnotationView(
@@ -75,12 +75,12 @@ private struct PharmacyAnnotationView: View {
                     Image(systemName: "cross.circle.fill")
                         .resizable()
                         .frame(width: 28, height: 28)
-                        .foregroundColor(Color(red: 0.4, green: 0.5, blue: 0.4))
+                        .foregroundColor(Color(red: 0.4, green: 0.6, blue: 0.4))
                     
                     // Selection animation ring
                     if isSelected {
                         Circle()
-                            .stroke(Color(red: 0.4, green: 0.5, blue: 0.4), lineWidth: 2)
+                            .stroke(Color(red: 0.4, green: 0.6, blue: 0.4), lineWidth: 2)
                             .frame(width: 50, height: 50)
                             .scaleEffect(showingPulse ? 1.3 : 1.0)
                             .opacity(showingPulse ? 0 : 1)
@@ -96,7 +96,7 @@ private struct PharmacyAnnotationView: View {
                     Text("\(pharmacy.availableMedications.filter { $0.status == .forSale }.count)")
                         .font(.caption)
                         .padding(6)
-                        .background(Color(red: 0.85, green: 0.5, blue: 0.2))
+                        .background(Color(red: 0.85, green: 0.6, blue: 0.3))
                         .foregroundColor(.white)
                         .clipShape(Circle())
                         .offset(y: -5)
@@ -105,9 +105,9 @@ private struct PharmacyAnnotationView: View {
                 // Pharmacy name
                 Text(pharmacy.name)
                     .font(.caption)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                     .padding(4)
-                    .background(.white.opacity(0.9))
+                    .background(.regularMaterial)
                     .cornerRadius(4)
                     .shadow(radius: 1)
             }

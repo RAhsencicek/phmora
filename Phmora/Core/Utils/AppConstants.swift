@@ -8,13 +8,27 @@ struct AppConstants {
     
     // MARK: - Colors
     struct Colors {
-        static let primary = Color(red: 0.4, green: 0.5, blue: 0.4)
-        static let secondary = Color(red: 0.85, green: 0.5, blue: 0.2)
-        static let background = Color(red: 0.95, green: 0.97, blue: 0.95)
-        static let cardBackground = Color.white
+        // Ana tema renkleri - karanlık mod uyumlu
+        static let primary = Color(red: 0.4, green: 0.6, blue: 0.4)
+        static let secondary = Color(red: 0.85, green: 0.6, blue: 0.3)
+        
+        // Background renkler - adaptif
+        static let background = Color.primary.opacity(0.05)
+        static let cardBackground = Color.secondary.opacity(0.1)
+        
+        // Text renkler - adaptif
+        static let primaryText = Color.primary
+        static let secondaryText = Color.secondary
+        static let mutedText = Color.gray
+        
+        // Durum renkleri
         static let success = Color.green
         static let error = Color.red
         static let warning = Color.orange
+        
+        // Ek renkler
+        static let medicationAvailable = success
+        static let medicationForSale = secondary
     }
     
     // MARK: - Sizes

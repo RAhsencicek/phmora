@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Pharmora, size en yakın nöbetçi eczaneleri gösterebilmek için konumunuza ihtiyaç duyar. Bu izin sadece uygulamayı aktif olarak kullandığınız sırada geçerlidir.</string>
+    <string>Pharmora, yakınınızdaki eczaneleri gösterebilmek ve ilaç alım-satım işlemlerinizi kolaylaştırabilmek için konumunuza ihtiyaç duyar. Bu izin sadece uygulamayı aktif olarak kullandığınız sırada geçerlidir.</string>
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>Pharmora, nöbetçi eczaneleri gösterebilmek için konum bilginize ihtiyaç duyar. Bu izin uygulamayı kullanmasanız bile konum bilgisi almamızı sağlar.</string>
+    <string>Pharmora, yakınınızdaki eczaneleri gösterebilmek ve ilaç alım-satım işlemlerinizi kolaylaştırabilmek için konum bilginize ihtiyaç duyar.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Pharmora, nöbetçi eczaneleri gösterebilmek için konum bilginize ihtiyaç duyar. Bu izin hem uygulamayı kullanırken hem de arka planda konum bilgisi almamızı sağlar.</string>
+    <string>Pharmora, yakınınızdaki eczaneleri gösterebilmek ve ilaç alım-satım işlemlerinizi kolaylaştırabilmek için konum bilginize ihtiyaç duyar.</string>
     <key>NSLocationTemporaryUsageDescriptionDictionary</key>
     <dict>
-        <key>NearbyDutyPharmaciesAccuracy</key>
-        <string>Size en yakın nöbetçi eczaneleri doğru şekilde gösterebilmek için tam konum bilginize ihtiyacımız var. Daha hassas konum bilgisi, daha doğru sonuçlar almanızı sağlar.</string>
+        <key>NearbyPharmaciesAccuracy</key>
+        <string>Size en yakın eczaneleri doğru şekilde gösterebilmek ve ilaç alım-satım işlemlerinizi kolaylaştırabilmek için tam konum bilginize ihtiyacımız var. Daha hassas konum bilgisi, daha doğru sonuçlar almanızı sağlar.</string>
     </dict>
     <key>NSLocationDefaultAccuracyReduced</key>
     <false/>

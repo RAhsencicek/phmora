@@ -14,8 +14,8 @@ struct HomeView: View {
     // MARK: - State Management
     @StateObject private var locationManager = LocationManager()
     @State private var mapRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 38.6748, longitude: 39.2225), // Elazığ merkez koordinatları
-        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+        center: CLLocationCoordinate2D(latitude: 39.0, longitude: 35.0), // Türkiye merkezi (Ankara yakını)
+        span: MKCoordinateSpan(latitudeDelta: 5.0, longitudeDelta: 5.0) // Geniş görünüm
     )
     @State private var selectedPharmacy: Pharmacy? = nil
     @State private var showPharmacyDetails = false
@@ -65,7 +65,7 @@ struct HomeView: View {
         if let location = location {
             mapRegion = MKCoordinateRegion(
                 center: location.coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02) // Kullanıcı konumunda yakın görünüm
             )
         }
     }

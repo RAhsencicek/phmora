@@ -2,6 +2,7 @@ import Foundation
 import CoreLocation
 import Combine
 
+@MainActor
 class LocationManager: NSObject, ObservableObject {
     // CLLocationManager nesnesi
     private let locationManager = CLLocationManager()
@@ -36,14 +37,6 @@ class LocationManager: NSObject, ObservableObject {
     func requestLocationPermission() {
         print("Konum izni isteniyor...")
         
-        // Background thread'de çalıştırılırsa, main thread'e taşı
-        if !Thread.isMainThread {
-            DispatchQueue.main.async { [weak self] in
-                self?.requestLocationPermission()
-            }
-            return
-        }
-        
         let authorizationStatus = locationManager.authorizationStatus
         print("Mevcut izin durumu: \(authorizationStatus.rawValue)")
         
@@ -68,64 +61,69 @@ class LocationManager: NSObject, ObservableObject {
         case .authorizedWhenInUse, .authorizedAlways:
             // İzin zaten verilmiş, konum al
             print("Konum izni mevcut, konum isteniyor...")
-            requestLocation()
+            Task {
+                await requestLocationAsync()
+            }
             
         @unknown default:
             break
         }
     }
     
-    // Tek seferlik konum alma
-    func requestLocation() {
-        // Background thread'de çalıştırılırsa, main thread'e taşı
-        if !Thread.isMainThread {
-            DispatchQueue.main.async { [weak self] in
-                self?.requestLocation()
-            }
-            return
-        }
-        
-        print("Konum isteniyor...")
-        
-        if CLLocationManager.locationServicesEnabled() {
-            if isAuthorized {
-                print("Konum servisleri açık ve izin verilmiş, konum isteniyor...")
-                locationManager.requestLocation()
-                
-                // iOS 14+ için hassas konum doğruluğunu kontrol et
-                if #available(iOS 14.0, *), locationManager.accuracyAuthorization == .reducedAccuracy {
-                    print("Hassas konum izni isteniyor...")
-                    locationManager.requestTemporaryFullAccuracyAuthorization(
-                        withPurposeKey: "NearbyDutyPharmaciesAccuracy"
-                    )
+    // Async konum alma - UI unresponsiveness'ı önler
+    private func requestLocationAsync() async {
+        await Task { @MainActor in
+            print("Async konum isteniyor...")
+            
+            if CLLocationManager.locationServicesEnabled() {
+                if isAuthorized {
+                    print("Konum servisleri açık ve izin verilmiş, konum isteniyor...")
+                    // Background thread'de location request yap
+                    Task.detached { [weak self] in
+                        await self?.performLocationRequest()
+                    }
+                    
+                    // iOS 14+ için hassas konum doğruluğunu kontrol et
+                    if #available(iOS 14.0, *), locationManager.accuracyAuthorization == .reducedAccuracy {
+                        print("Hassas konum izni isteniyor...")
+                        locationManager.requestTemporaryFullAccuracyAuthorization(
+                            withPurposeKey: "NearbyPharmaciesAccuracy"
+                        )
+                    }
+                } else {
+                    print("Konum servisleri açık fakat izin verilmemiş, izin isteniyor...")
+                    requestLocationPermission()
                 }
             } else {
-                print("Konum servisleri açık fakat izin verilmemiş, izin isteniyor...")
-                requestLocationPermission()
+                // Konum servisleri kapalıysa hata bildir
+                print("Konum servisleri kapalı")
+                error = NSError(
+                    domain: "LocationManager",
+                    code: 2,
+                    userInfo: [
+                        NSLocalizedDescriptionKey: "Konum servisleri kapalı. Lütfen Ayarlar > Gizlilik ve Güvenlik > Konum Servisleri bölümünden konum servislerini açın."
+                    ]
+                )
             }
-        } else {
-            // Konum servisleri kapalıysa hata bildir
-            print("Konum servisleri kapalı")
-            error = NSError(
-                domain: "LocationManager",
-                code: 2,
-                userInfo: [
-                    NSLocalizedDescriptionKey: "Konum servisleri kapalı. Lütfen Ayarlar > Gizlilik ve Güvenlik > Konum Servisleri bölümünden konum servislerini açın."
-                ]
-            )
+        }.value
+    }
+    
+    // Background thread'de location request - UI blocking'i önler
+    private func performLocationRequest() async {
+        await MainActor.run {
+            locationManager.requestLocation()
+        }
+    }
+    
+    // Tek seferlik konum alma - Public interface
+    func requestLocation() {
+        Task {
+            await requestLocationAsync()
         }
     }
     
     // Sürekli konum güncellemelerini başlatma
     func startUpdatingLocation() {
-        // Background thread'de çalıştırılırsa, main thread'e taşı
-        if !Thread.isMainThread {
-            DispatchQueue.main.async { [weak self] in
-                self?.startUpdatingLocation()
-            }
-            return
-        }
-        
         if isAuthorized {
             locationManager.startUpdatingLocation()
         } else {
@@ -135,14 +133,6 @@ class LocationManager: NSObject, ObservableObject {
     
     // Konum güncellemelerini durdurma
     func stopUpdatingLocation() {
-        // Background thread'de çalıştırılırsa, main thread'e taşı
-        if !Thread.isMainThread {
-            DispatchQueue.main.async { [weak self] in
-                self?.stopUpdatingLocation()
-            }
-            return
-        }
-        
         locationManager.stopUpdatingLocation()
     }
     
@@ -164,17 +154,18 @@ extension LocationManager: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         print("Konum izni durumu değişti: \(manager.authorizationStatus.rawValue)")
         
-        // Durum değişikliğini ana thread'de işle
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
+        // Ana thread'de güncelle
+        Task { @MainActor in
             self.authorizationStatus = manager.authorizationStatus
             
             switch manager.authorizationStatus {
             case .authorizedWhenInUse, .authorizedAlways:
                 print("Konum izni verildi, konum isteniyor...")
                 self.error = nil
-                self.requestLocation()
+                // Authorization callback'inden sonra location request yap
+                Task {
+                    await self.requestLocationAsync()
+                }
                 
             case .denied, .restricted:
                 print("Konum izni reddedildi veya kısıtlandı")
@@ -198,10 +189,7 @@ extension LocationManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         print("Konum güncellendi: \(locations.count) lokasyon alındı")
         
-        // Ana thread'de işle
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
+        Task { @MainActor in
             // En son ve en doğru konumu al
             if let location = locations.last {
                 print("Konum alındı: \(location.coordinate.latitude), \(location.coordinate.longitude)")
@@ -214,10 +202,7 @@ extension LocationManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Konum alınamadı: \(error.localizedDescription)")
         
-        // Ana thread'de işle
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
+        Task { @MainActor in
             if let clError = error as? CLError {
                 switch clError.code {
                 case .denied:
@@ -252,14 +237,11 @@ extension LocationManager: CLLocationManagerDelegate {
     func locationManagerDidChangeAccuracyAuthorization(_ manager: CLLocationManager) {
         print("Konum doğruluğu değişti: \(manager.accuracyAuthorization.rawValue)")
         
-        // Ana thread'de işle
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
+        Task { @MainActor in
             if manager.accuracyAuthorization == .reducedAccuracy {
                 print("Hassas konum izni yok, isteniyor...")
                 self.locationManager.requestTemporaryFullAccuracyAuthorization(
-                    withPurposeKey: "NearbyDutyPharmaciesAccuracy"
+                    withPurposeKey: "NearbyPharmaciesAccuracy"
                 )
             }
         }

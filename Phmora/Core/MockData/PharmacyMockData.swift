@@ -9,10 +9,39 @@ import MapKit
 /// This structure matches the backend API response format for easy migration
 struct PharmacyMockData {
     
-    /// Sample pharmacies for Elazığ city center
+    /// Sample pharmacies worldwide for testing
     /// TODO: Replace with real API data from backend
     static let pharmacies: [Pharmacy] = [
-        // Original pharmacies
+        // GLOBAL TEST PHARMACIES FOR DEBUG
+        Pharmacy(
+            name: "San Francisco Pharmacy",
+            address: "Market St, San Francisco, CA",
+            phone: "+1 415 123 4567",
+            coordinate: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+            availableMedications: [
+                Medication(name: "Test Medicine SF", description: "Test için", price: 25.90, quantity: 10, expiryDate: Calendar.current.date(byAdding: .month, value: 6, to: Date()), imageURL: nil, status: .forSale)
+            ]
+        ),
+        Pharmacy(
+            name: "New York Pharmacy",
+            address: "Times Square, New York, NY",
+            phone: "+1 212 123 4567", 
+            coordinate: CLLocationCoordinate2D(latitude: 40.7589, longitude: -73.9851),
+            availableMedications: [
+                Medication(name: "Test Medicine NY", description: "Test için", price: 32.50, quantity: 15, expiryDate: Calendar.current.date(byAdding: .month, value: 8, to: Date()), imageURL: nil, status: .forSale)
+            ]
+        ),
+        Pharmacy(
+            name: "London Pharmacy",
+            address: "Oxford Street, London, UK",
+            phone: "+44 20 1234 5678",
+            coordinate: CLLocationCoordinate2D(latitude: 51.5074, longitude: -0.1278),
+            availableMedications: [
+                Medication(name: "Test Medicine London", description: "Test için", price: 18.75, quantity: 20, expiryDate: Calendar.current.date(byAdding: .month, value: 3, to: Date()), imageURL: nil, status: .forSale)
+            ]
+        ),
+        
+        // Original Elazığ pharmacies
         Pharmacy(
             name: "Merkez Eczanesi",
             address: "Çarşı Mah. Gazi Cad. No:84, Merkez/Elazığ",
@@ -58,7 +87,7 @@ struct PharmacyMockData {
             availableMedications: []
         ),
         
-        // Additional 20 pharmacies
+        // Additional 15 pharmacies (keeping some of the originals)
         Pharmacy(
             name: "Doğan Eczanesi",
             address: "Mustafapaşa Mah. Hürriyet Cad. No:45, Merkez/Elazığ",
@@ -89,22 +118,6 @@ struct PharmacyMockData {
             ]
         ),
         Pharmacy(
-            name: "Asya Eczanesi",
-            address: "Nailbey Mah. Sanat Cad. No:89/A, Merkez/Elazığ",
-            phone: "0424 218 9012",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6710, longitude: 39.2150),
-            availableMedications: [
-                Medication(name: "Omega-3", description: "Beyin sağlığı takviyesi", price: 42.30, quantity: 15, expiryDate: Calendar.current.date(byAdding: .month, value: 11, to: Date()), imageURL: nil, status: .available)
-            ]
-        ),
-        Pharmacy(
-            name: "Barış Eczanesi",
-            address: "Yeni Mah. Barış Cad. No:23/C, Merkez/Elazığ",
-            phone: "0424 241 5678",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6760, longitude: 39.2200),
-            availableMedications: []
-        ),
-        Pharmacy(
             name: "Modern Eczanesi",
             address: "Çaydaçıra Mah. Yeşil Cad. No:34, Merkez/Elazığ",
             phone: "0424 225 6789",
@@ -115,130 +128,12 @@ struct PharmacyMockData {
             ]
         ),
         Pharmacy(
-            name: "Kardelen Eczanesi",
-            address: "Aksaray Mah. Doktor Cad. No:78/D, Merkez/Elazığ",
-            phone: "0424 236 7890",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6730, longitude: 39.2160),
-            availableMedications: [
-                Medication(name: "Sinecod", description: "Öksürük şurubu", price: 31.20, quantity: 14, expiryDate: Calendar.current.date(byAdding: .month, value: 3, to: Date()), imageURL: nil, status: .forSale)
-            ]
-        ),
-        Pharmacy(
-            name: "Sevgi Eczanesi",
-            address: "Sürsürü Mah. Vatan Cad. No:45/A, Merkez/Elazığ",
-            phone: "0424 219 8901",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6690, longitude: 39.2320),
-            availableMedications: [
-                Medication(name: "Magnezyum", description: "Mineral takviyesi", price: 29.90, quantity: 16, expiryDate: Calendar.current.date(byAdding: .month, value: 9, to: Date()), imageURL: nil, status: .available),
-                Medication(name: "Coenzyme Q10", description: "Kalp sağlığı", price: 67.80, quantity: 6, expiryDate: Calendar.current.date(byAdding: .month, value: 10, to: Date()), imageURL: nil, status: .forSale)
-            ]
-        ),
-        Pharmacy(
             name: "Türkiye Eczanesi",
             address: "Ulukent Mah. Cumhuriyet Cad. No:112, Merkez/Elazığ",
             phone: "0424 242 9012",
             coordinate: CLLocationCoordinate2D(latitude: 38.6800, longitude: 39.2250),
             availableMedications: [
                 Medication(name: "Losec", description: "Reflü ilacı", price: 89.50, quantity: 4, expiryDate: Calendar.current.date(byAdding: .month, value: 2, to: Date()), imageURL: nil, status: .forSale)
-            ]
-        ),
-        Pharmacy(
-            name: "Nil Eczanesi",
-            address: "Karsıyaka Mah. Nil Cad. No:67/B, Merkez/Elazığ",
-            phone: "0424 227 0123",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6720, longitude: 39.2300),
-            availableMedications: []
-        ),
-        Pharmacy(
-            name: "Anadolu Eczanesi",
-            address: "Fevzipaşa Mah. Anadolu Cad. No:89, Merkez/Elazığ",
-            phone: "0424 238 1234",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6750, longitude: 39.2190),
-            availableMedications: [
-                Medication(name: "Iron", description: "Demir takviyesi", price: 24.70, quantity: 20, expiryDate: Calendar.current.date(byAdding: .month, value: 7, to: Date()), imageURL: nil, status: .available),
-                Medication(name: "Kalsiyum", description: "Kemik sağlığı", price: 33.40, quantity: 11, expiryDate: Calendar.current.date(byAdding: .month, value: 12, to: Date()), imageURL: nil, status: .forSale)
-            ]
-        ),
-        Pharmacy(
-            name: "Marmara Eczanesi",
-            address: "Hilalkent Mah. Marmara Cad. No:34/C, Merkez/Elazığ",
-            phone: "0424 244 2345",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6770, longitude: 39.2280),
-            availableMedications: [
-                Medication(name: "Lyrica", description: "Sinir ağrısı", price: 156.20, quantity: 3, expiryDate: Calendar.current.date(byAdding: .month, value: 4, to: Date()), imageURL: nil, status: .forSale)
-            ]
-        ),
-        Pharmacy(
-            name: "Çiçek Eczanesi",
-            address: "Abdullahpaşa Mah. Çiçek Sok. No:12/A, Merkez/Elazığ",
-            phone: "0424 221 3456",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6665, longitude: 39.2135),
-            availableMedications: [
-                Medication(name: "Folic Acid", description: "Folik asit", price: 18.50, quantity: 25, expiryDate: Calendar.current.date(byAdding: .month, value: 8, to: Date()), imageURL: nil, status: .available)
-            ]
-        ),
-        Pharmacy(
-            name: "Gülhan Eczanesi",
-            address: "İcadiye Mah. Gülhan Cad. No:56/B, Merkez/Elazığ",
-            phone: "0424 233 4567",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6810, longitude: 39.2265),
-            availableMedications: [
-                Medication(name: "Concor", description: "Kalp ilacı", price: 94.30, quantity: 5, expiryDate: Calendar.current.date(byAdding: .month, value: 6, to: Date()), imageURL: nil, status: .forSale),
-                Medication(name: "Glucosamine", description: "Eklem sağlığı", price: 48.90, quantity: 8, expiryDate: Calendar.current.date(byAdding: .month, value: 10, to: Date()), imageURL: nil, status: .available)
-            ]
-        ),
-        Pharmacy(
-            name: "Gözde Eczanesi",
-            address: "Esentepe Mah. Gözde Cad. No:78/A, Merkez/Elazığ",
-            phone: "0424 245 5678",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6725, longitude: 39.2220),
-            availableMedications: []
-        ),
-        Pharmacy(
-            name: "Prestij Eczanesi",
-            address: "Aksaray Mah. Prestij Cad. No:91/C, Merkez/Elazığ",
-            phone: "0424 226 6789",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6795, longitude: 39.2185),
-            availableMedications: [
-                Medication(name: "Sertraline", description: "Antidepresan", price: 87.60, quantity: 7, expiryDate: Calendar.current.date(byAdding: .month, value: 5, to: Date()), imageURL: nil, status: .forSale)
-            ]
-        ),
-        Pharmacy(
-            name: "Huzur Eczanesi",
-            address: "Güneykent Mah. Huzur Sok. No:23/B, Merkez/Elazığ",
-            phone: "0424 239 7890",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6745, longitude: 39.2155),
-            availableMedications: [
-                Medication(name: "Melatonin", description: "Uyku düzenleyici", price: 39.80, quantity: 13, expiryDate: Calendar.current.date(byAdding: .month, value: 9, to: Date()), imageURL: nil, status: .available),
-                Medication(name: "Centrum", description: "Multivitamin", price: 76.50, quantity: 6, expiryDate: Calendar.current.date(byAdding: .month, value: 11, to: Date()), imageURL: nil, status: .forSale)
-            ]
-        ),
-        Pharmacy(
-            name: "Sena Eczanesi",
-            address: "Çarşı Mah. Sena Cad. No:45/D, Merkez/Elazığ",
-            phone: "0424 217 8901",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6715, longitude: 39.2235),
-            availableMedications: [
-                Medication(name: "Symbicort", description: "Astım ilacı", price: 198.70, quantity: 2, expiryDate: Calendar.current.date(byAdding: .month, value: 3, to: Date()), imageURL: nil, status: .forSale)
-            ]
-        ),
-        Pharmacy(
-            name: "Atlas Eczanesi",
-            address: "Doğukent Mah. Atlas Cad. No:67/A, Merkez/Elazığ",
-            phone: "0424 240 9012",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6775, longitude: 39.2295),
-            availableMedications: [
-                Medication(name: "Atorvastatin", description: "Kolesterol düşürücü", price: 112.40, quantity: 4, expiryDate: Calendar.current.date(byAdding: .month, value: 7, to: Date()), imageURL: nil, status: .forSale),
-                Medication(name: "Fish Oil", description: "Balık yağı", price: 52.30, quantity: 10, expiryDate: Calendar.current.date(byAdding: .month, value: 13, to: Date()), imageURL: nil, status: .available)
-            ]
-        ),
-        Pharmacy(
-            name: "Yeni Yaşam Eczanesi",
-            address: "Güvenlik Mah. Yaşam Cad. No:89/B, Merkez/Elazığ",
-            phone: "0424 228 0123",
-            coordinate: CLLocationCoordinate2D(latitude: 38.6655, longitude: 39.2170),
-            availableMedications: [
-                Medication(name: "Probiyotik Plus", description: "Gelişmiş probiyotik", price: 67.90, quantity: 9, expiryDate: Calendar.current.date(byAdding: .month, value: 8, to: Date()), imageURL: nil, status: .available)
             ]
         )
     ]

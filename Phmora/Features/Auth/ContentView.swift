@@ -8,118 +8,337 @@
 import SwiftUI
 import Combine
 
-// Ana görünüm yönetimi için enum
-enum AuthScreen {
-    case login
-    case register
-}
-
 struct ContentView: View {
-    @State private var currentAuthScreen: AuthScreen = .login
+    @State private var showLoadingScreen = true
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Logo ve başlık
-                VStack(spacing: 20) {
-                    Image("PharmoraLogo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 200, height: 200)
-                }
-                .padding(.top, 50)
-                
-                // Segment kontrol
-                Picker("Auth Screen", selection: $currentAuthScreen) {
-                    Text("Giriş").tag(AuthScreen.login)
-                    Text("Kayıt").tag(AuthScreen.register)
-                }
-                .pickerStyle(.segmented)
-                .padding()
-                
-                // İçerik alanı
-                if currentAuthScreen == .login {
-                    LoginView()
-                        .transition(.opacity)
-                } else {
-                    RegisterView()
-                        .transition(.opacity)
-                }
-                
-                Spacer()
+        ZStack {
+            if showLoadingScreen {
+                LoadingScreen()
+                    .transition(.opacity)
+            } else {
+                LoginScreen()
+                    .transition(.opacity)
             }
-            .background(.background)
+        }
+        .onAppear {
+            // 4 saniye sonra loading ekranını kapat
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+                withAnimation(.easeInOut(duration: 0.8)) {
+                    showLoadingScreen = false
+                }
+            }
         }
     }
 }
 
-// Giriş ekranı
-struct LoginView: View {
-    @StateObject private var viewModel = LoginViewModel()
-    @State private var showMainView = false
+// MARK: - Loading Screen
+struct LoadingScreen: View {
+    @State private var animationOffset: CGFloat = 0
+    @State private var logoScale: CGFloat = 0.5
+    @State private var logoOpacity: Double = 0
+    @State private var textOpacity: Double = 0
     
     var body: some View {
-        VStack(spacing: 20) {
-            // Giriş formu
-            VStack(spacing: 15) {
-                TextField("Eczacı Kimlik No", text: $viewModel.pharmacistId)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .autocapitalization(.none)
-                    .keyboardType(.numberPad)
-                    .disabled(viewModel.isLoading)
+        GeometryReader { geometry in
+            ZStack {
+                // Gradient Background
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.blue.opacity(0.8),
+                        Color.purple.opacity(0.6),
+                        Color.cyan.opacity(0.4)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
                 
-                SecureField("Şifre", text: $viewModel.password)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .disabled(viewModel.isLoading)
-                
-                Button("Şifremi Unuttum") {
-                    // Şifre sıfırlama işlemi
+                // Animated Particles
+                ForEach(0..<20, id: \.self) { index in
+                    Circle()
+                        .fill(Color.white.opacity(0.3))
+                        .frame(width: CGFloat.random(in: 4...12))
+                        .position(
+                            x: CGFloat.random(in: 0...geometry.size.width),
+                            y: CGFloat.random(in: 0...geometry.size.height)
+                        )
+                        .offset(y: animationOffset)
+                        .animation(
+                            Animation.linear(duration: Double.random(in: 3...6))
+                                .repeatForever(autoreverses: false),
+                            value: animationOffset
+                        )
                 }
-                .font(.footnote)
-                .foregroundColor(.blue)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .padding(.horizontal)
-            
-            // Giriş butonu
-            Button(action: viewModel.login) {
-                HStack {
-                    if viewModel.isLoading {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .padding(.trailing, 5)
+                
+                // Floating Geometric Shapes
+                ForEach(0..<8, id: \.self) { index in
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.white.opacity(0.2))
+                        .frame(width: 20, height: 20)
+                        .rotationEffect(.degrees(animationOffset * 0.5))
+                        .position(
+                            x: CGFloat.random(in: 50...geometry.size.width - 50),
+                            y: CGFloat.random(in: 100...geometry.size.height - 100)
+                        )
+                        .animation(
+                            Animation.easeInOut(duration: Double.random(in: 2...4))
+                                .repeatForever(autoreverses: true),
+                            value: animationOffset
+                        )
+                }
+                
+                // Main Content
+                VStack(spacing: 30) {
+                    // Logo
+                    Image("PharmoraLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 250, height: 250)
+                        .scaleEffect(logoScale)
+                        .opacity(logoOpacity)
+                        .shadow(color: .blue.opacity(0.4), radius: 10)
+                    
+                    // App Name
+                    VStack(spacing: 8) {
+                        Text("")
+                            .font(.system(size: 42, weight: .bold, design: .rounded))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [.white, .cyan.opacity(0.8)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .opacity(textOpacity)
+                        
+                        Text("Eczane Stok Yönetim Sistemi")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white.opacity(0.8))
+                            .opacity(textOpacity)
                     }
-                    Text("Giriş Yap")
+                    
+                    // Loading Indicator
+                    VStack(spacing: 15) {
+                        // Custom Loading Animation
+                        HStack(spacing: 8) {
+                            ForEach(0..<3) { index in
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 12, height: 12)
+                                    .scaleEffect(animationOffset > CGFloat(index) * 0.3 ? 1.2 : 0.8)
+                                    .animation(
+                                        Animation.easeInOut(duration: 0.6)
+                                            .repeatForever()
+                                            .delay(Double(index) * 0.2),
+                                        value: animationOffset
+                                    )
+                            }
+                        }
+                        
+                        Text("")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
+                            .opacity(textOpacity)
+                    }
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(10)
             }
-            .padding(.horizontal)
-            .disabled(viewModel.isLoading)
-            
-            if !viewModel.errorMessage.isEmpty {
-                Text(viewModel.errorMessage)
-                    .foregroundColor(.red)
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color.red.opacity(0.1))
-                    )
-                    .padding(.horizontal)
-            }
-            
-            Spacer()
         }
-        .padding(.top, 30)
+        .onAppear {
+            startAnimations()
+        }
+    }
+    
+    private func startAnimations() {
+        // Logo animation
+        withAnimation(.easeOut(duration: 1.0)) {
+            logoScale = 1.0
+            logoOpacity = 1.0
+        }
+        
+        // Text animation
+        withAnimation(.easeOut(duration: 1.0).delay(0.3)) {
+            textOpacity = 1.0
+        }
+        
+        // Particle animation
+        withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: false)) {
+            animationOffset = -500
+        }
+    }
+}
+
+// MARK: - Login Screen
+struct LoginScreen: View {
+    @StateObject private var viewModel = LoginViewModel()
+    @State private var logoScale: CGFloat = 0.8
+    @State private var formOpacity: Double = 0
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                // Background Gradient
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color(UIColor.systemBackground),
+                        Color.blue.opacity(0.05)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 40) {
+                        // Header Section
+                        VStack(spacing: 20) {
+                            // Logo
+                            Image("PharmoraLogo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 250, height: 250)
+                                .scaleEffect(logoScale)
+                                .shadow(color: .blue.opacity(0.3), radius: 10)
+                            
+                         
+                        }
+                        .padding(.top, 60)
+                        
+                        // Login Form
+                        VStack(spacing: 25) {
+                            // Input Fields
+                            VStack(spacing: 20) {
+                                // Pharmacist ID Field
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Eczacı Kimlik No")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.secondary)
+                                    
+                                    TextField("Eczane ID Girin", text: $viewModel.pharmacistId)
+                                        .textFieldStyle(ModernTextFieldStyle())
+                                        .autocapitalization(.none)
+                                        .keyboardType(.numberPad)
+                                        .disabled(viewModel.isLoading)
+                                }
+                                
+                                // Password Field
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Şifre")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.secondary)
+                                    
+                                    SecureField("Şifrenizi girin", text: $viewModel.password)
+                                        .textFieldStyle(ModernTextFieldStyle())
+                                        .disabled(viewModel.isLoading)
+                                }
+                            }
+                            
+                            // Forgot Password
+                            HStack {
+                                Spacer()
+                                Button("") {
+                                    // Şifre sıfırlama işlemi
+                                }
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.blue)
+                            }
+                            
+                            // Login Button
+                            Button(action: viewModel.login) {
+                                HStack(spacing: 12) {
+                                    if viewModel.isLoading {
+                                        ProgressView()
+                                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                            .scaleEffect(0.8)
+                                    } else {
+                                        Image(systemName: "arrow.right.circle.fill")
+                                            .font(.system(size: 18))
+                                    }
+                                    
+                                    Text("Giriş Yap")
+                                        .font(.system(size: 16, weight: .semibold))
+                                }
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 56)
+                                .background(
+                                    LinearGradient(
+                                        colors: [Color.green, Color.blue.opacity(0.8)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .foregroundColor(.white)
+                                .cornerRadius(16)
+                                .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
+                            }
+                            .disabled(viewModel.isLoading)
+                            .scaleEffect(viewModel.isLoading ? 0.98 : 1.0)
+                            .animation(.easeInOut(duration: 0.1), value: viewModel.isLoading)
+                            
+                            // Error Message
+                            if !viewModel.errorMessage.isEmpty {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .foregroundColor(.red)
+                                    
+                                    Text(viewModel.errorMessage)
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(.red)
+                                    
+                                    Spacer()
+                                }
+                                .padding()
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.red.opacity(0.1))
+                                        .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                                )
+                                .transition(.scale.combined(with: .opacity))
+                            }
+                        }
+                        .padding(.horizontal, 30)
+                        .opacity(formOpacity)
+                        
+                        Spacer(minLength: 50)
+                    }
+                }
+            }
+        }
+        .onAppear {
+            startLoginAnimations()
+        }
         .fullScreenCover(isPresented: $viewModel.isLoggedIn) {
             MainView()
         }
     }
+    
+    private func startLoginAnimations() {
+        withAnimation(.spring(response: 0.8, dampingFraction: 0.8)) {
+            logoScale = 1.0
+        }
+        
+        withAnimation(.easeOut(duration: 0.8).delay(0.2)) {
+            formOpacity = 1.0
+        }
+    }
 }
 
+// MARK: - Modern Text Field Style
+struct ModernTextFieldStyle: TextFieldStyle {
+    func _body(configuration: TextField<Self._Label>) -> some View {
+        configuration
+            .padding(.horizontal, 16)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(UIColor.systemGray6))
+                    .stroke(Color(UIColor.systemGray4), lineWidth: 1)
+            )
+            .font(.system(size: 16, weight: .medium))
+    }
+}
+
+// MARK: - Login View Model
 class LoginViewModel: ObservableObject {
     @Published var pharmacistId = ""
     @Published var password = ""
@@ -131,7 +350,9 @@ class LoginViewModel: ObservableObject {
     
     func login() {
         guard !pharmacistId.isEmpty && !password.isEmpty else {
-            errorMessage = "Lütfen eczacı kimlik no ve şifrenizi girin"
+            withAnimation(.spring()) {
+                errorMessage = "Lütfen eczacı kimlik no ve şifrenizi girin"
+            }
             return
         }
         
@@ -145,10 +366,12 @@ class LoginViewModel: ObservableObject {
                 
                 switch completion {
                 case .failure(let error):
-                    if let apiError = error as? APIError {
-                        self?.errorMessage = apiError.errorDescription ?? "Bilinmeyen bir hata oluştu"
-                    } else {
-                        self?.errorMessage = error.localizedDescription
+                    withAnimation(.spring()) {
+                        if let apiError = error as? APIError {
+                            self?.errorMessage = apiError.errorDescription ?? "Bilinmeyen bir hata oluştu"
+                        } else {
+                            self?.errorMessage = error.localizedDescription
+                        }
                     }
                     self?.isLoggedIn = false
                 case .finished:
@@ -160,84 +383,6 @@ class LoginViewModel: ObservableObject {
                 UserDefaults.standard.set(response.user.pharmacistId, forKey: AppConstants.UserDefaultsKeys.pharmacistId)
             })
             .store(in: &cancellables)
-    }
-}
-
-// Kayıt ekranı
-struct RegisterView: View {
-    @State private var name = ""
-    @State private var surname = ""
-    @State private var kimlikNo = ""
-    @State private var email = ""
-    @State private var phone = ""
-    @State private var password = ""
-    @State private var confirmPassword = ""
-    @State private var showingAlert = false
-    @State private var isLoading = false
-    
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                // Kayıt formu
-                VStack(spacing: 15) {
-                    TextField("Ad", text: $name)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    TextField("Soyad", text: $surname)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    TextField("Eczacı Kimlik No", text: $kimlikNo)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    TextField("E-posta", text: $email)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    TextField("Telefon", text: $phone)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    SecureField("Şifre", text: $password)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    SecureField("Şifre Tekrar", text: $confirmPassword)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                }
-                .padding(.horizontal)
-                
-                // Kayıt butonu
-                Button(action: {
-                    withAnimation {
-                        isLoading = true
-                        // Kayıt işlemi simülasyonu
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            isLoading = false
-                            showingAlert = true
-                        }
-                    }
-                }) {
-                    HStack {
-                        if isLoading {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                .padding(.trailing, 5)
-                        }
-                        Text("Kayıt Ol")
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                }
-                .padding(.horizontal)
-                .disabled(isLoading)
-            }
-            .padding(.top, 30)
-        }
-        .alert("Başarılı", isPresented: $showingAlert) {
-            Button("Tamam", role: .cancel) {}
-        } message: {
-            Text("Kayıt başarılı!")
-        }
     }
 }
 

@@ -1,10 +1,4 @@
 import SwiftUI
-import UIKit
-
-// UIKit renkleri için Color extension'ı ekleyin
-extension Color {
-    static let systemGray6 = Color(UIColor.systemGray6)
-}
 
 struct PurchaseView: View {
     let medication: Medication
@@ -98,23 +92,23 @@ struct PurchaseView: View {
                         
                         TextField("Kart Numarası", text: $cardNumber)
                             .padding()
-                            .background(Color(.systemGray6))
+                            .background(Color.gray.opacity(0.1))
                             .cornerRadius(8)
                         
                         TextField("Kart Üzerindeki İsim", text: $cardName)
                             .padding()
-                            .background(Color(.systemGray6))
+                            .background(Color.gray.opacity(0.1))
                             .cornerRadius(8)
                         
                         HStack {
                             TextField("Son Kullanma (AA/YY)", text: $cardExpiry)
                                 .padding()
-                                .background(Color(.systemGray6))
+                                .background(Color.gray.opacity(0.1))
                                 .cornerRadius(8)
                             
                             TextField("CVV", text: $cardCVV)
                                 .padding()
-                                .background(Color(.systemGray6))
+                                .background(Color.gray.opacity(0.1))
                                 .cornerRadius(8)
                         }
                     }

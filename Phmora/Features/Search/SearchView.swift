@@ -7,6 +7,7 @@ struct SearchView: View {
     @State private var isSearching = false
     @State private var selectedMedication: Medication? = nil
     @State private var showMedicationDetail = false
+    @State private var searchFieldFocused = false
     
     // Örnek veriler (gerçek uygulamada bir veritabanından gelecek)
     let samplePharmacies: [Pharmacy] = [
@@ -33,86 +34,205 @@ struct SearchView: View {
     ]
     
     var body: some View {
-        VStack {
-            // Arama çubuğu
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.gray)
-                
-                TextField("İlaç ara...", text: $searchText)
-                    .onChange(of: searchText) { newValue in
-                        searchMedications()
-                    }
-                
-                if !searchText.isEmpty {
-                    Button(action: {
-                        searchText = ""
-                        medications = []
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.gray)
-                    }
-                }
-            }
-            .padding()
-            .background(Color(uiColor: .systemGray6))
-            .cornerRadius(10)
-            .padding(.horizontal)
+        ZStack {
+            // Background Gradient
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(red: 0.95, green: 0.97, blue: 0.98),
+                    Color.blue.opacity(0.05)
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
             
-            if isSearching {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .scaleEffect(1.5)
-                    .padding()
-            } else if medications.isEmpty && !searchText.isEmpty {
-                VStack(spacing: 20) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(size: 50))
-                        .foregroundColor(.gray)
-                    Text("Aradığınız ilaç bulunamadı")
-                        .font(.headline)
-                        .foregroundColor(.gray)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    ForEach(medications) { medication in
-                        Button(action: {
-                            selectedMedication = medication
-                            showMedicationDetail = true
-                        }) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(medication.name)
-                                        .font(.headline)
-                                    Text(medication.description)
-                                        .font(.subheadline)
+            VStack(spacing: 0) {
+                // Modern Search Header
+                VStack(spacing: 16) {
+                    // Search Bar
+                    HStack(spacing: 12) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.blue.opacity(0.1))
+                                .frame(width: 40, height: 40)
+                            
+                            Image(systemName: "magnifyingglass")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(.blue)
+                        }
+                        
+                        TextField("İlaç adı veya etken madde ara...", text: $searchText)
+                            .font(.system(size: 16, weight: .medium))
+                            .onChange(of: searchText) { newValue in
+                                searchMedications()
+                            }
+                            .onTapGesture {
+                                searchFieldFocused = true
+                            }
+                        
+                        if !searchText.isEmpty {
+                            Button(action: {
+                                withAnimation(.spring()) {
+                                    searchText = ""
+                                    medications = []
+                                }
+                            }) {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.1))
+                                        .frame(width: 32, height: 32)
+                                    
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 14, weight: .semibold))
                                         .foregroundColor(.gray)
                                 }
-                                
-                                Spacer()
-                                
-                                VStack(alignment: .trailing, spacing: 4) {
-                                    Text("\(String(format: "%.2f", medication.price)) TL")
-                                        .font(.subheadline)
-                                        .bold()
-                                    
-                                    Text(medication.status.displayName)
-                                        .font(.caption)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 3)
-                                        .background(statusColor(medication.status))
-                                        .foregroundColor(.white)
-                                        .cornerRadius(8)
-                                }
                             }
-                            .padding(.vertical, 4)
                         }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.white)
+                            .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
+                    )
+                    .scaleEffect(searchFieldFocused ? 1.02 : 1.0)
+                    .animation(.spring(response: 0.3), value: searchFieldFocused)
+                    
+                    // Search Stats
+                    if !medications.isEmpty {
+                        HStack {
+                            Text("\(medications.count) sonuç bulundu")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.secondary)
+                            
+                            Spacer()
+                            
+                            Text("En uygun fiyatlar")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(.blue)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(12)
+                        }
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
+                .padding(.bottom, 16)
+                
+                // Content Area
+                if isSearching {
+                    // Modern Loading State
+                    VStack(spacing: 24) {
+                        ZStack {
+                            Circle()
+                                .stroke(Color.blue.opacity(0.2), lineWidth: 4)
+                                .frame(width: 60, height: 60)
+                            
+                            Circle()
+                                .trim(from: 0, to: 0.7)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [Color.blue, Color.green],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                                )
+                                .frame(width: 60, height: 60)
+                                .rotationEffect(.degrees(-90))
+                                .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: isSearching)
+                        }
+                        
+                        VStack(spacing: 8) {
+                            Text("Aranıyor...")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(.primary)
+                            
+                            Text("İlaçlar taranıyor")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    
+                } else if medications.isEmpty && !searchText.isEmpty {
+                    // Empty State
+                    VStack(spacing: 24) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.orange.opacity(0.1))
+                                .frame(width: 80, height: 80)
+                            
+                            Image(systemName: "magnifyingglass")
+                                .font(.system(size: 32, weight: .semibold))
+                                .foregroundColor(.orange)
+                        }
+                        
+                        VStack(spacing: 12) {
+                            Text("İlaç Bulunamadı")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.primary)
+                            
+                            Text("Aradığınız ilaç mevcut değil.\nFarklı bir arama deneyin.")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    
+                } else if searchText.isEmpty {
+                    // Initial State
+                    VStack(spacing: 24) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.blue.opacity(0.1))
+                                .frame(width: 80, height: 80)
+                            
+                            Image(systemName: "pills.fill")
+                                .font(.system(size: 32, weight: .semibold))
+                                .foregroundColor(.blue)
+                        }
+                        
+                        VStack(spacing: 12) {
+                            Text("İlaç Arama")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.primary)
+                            
+                            Text("Aradığınız ilacın adını veya\netken maddesini yazın")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    
+                } else {
+                    // Results List
+                    ScrollView {
+                        LazyVStack(spacing: 12) {
+                            ForEach(medications) { medication in
+                                MedicationCard(
+                                    medication: medication,
+                                    onTap: {
+                                        selectedMedication = medication
+                                        showMedicationDetail = true
+                                    }
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 20)
                     }
                 }
             }
         }
-        .navigationTitle("İlaç Ara")
+        .navigationTitle("İlaç Arama")
+        .navigationBarTitleDisplayMode(.large)
         .sheet(isPresented: $showMedicationDetail) {
             if let medication = selectedMedication, 
                let pharmacy = findPharmacyForMedication(medication) {
@@ -130,19 +250,20 @@ struct SearchView: View {
         isSearching = true
         
         // Gerçek uygulamada API çağrısı yapılır
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            // Örnek arama sonuçları
-            var allMedications: [Medication] = []
-            
-            for pharmacy in self.samplePharmacies {
-                allMedications.append(contentsOf: pharmacy.availableMedications)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            withAnimation(.spring()) {
+                var allMedications: [Medication] = []
+                
+                for pharmacy in self.samplePharmacies {
+                    allMedications.append(contentsOf: pharmacy.availableMedications)
+                }
+                
+                self.medications = allMedications.filter { medication in
+                    medication.name.lowercased().contains(self.searchText.lowercased()) ||
+                    medication.description.lowercased().contains(self.searchText.lowercased())
+                }
+                self.isSearching = false
             }
-            
-            self.medications = allMedications.filter { medication in
-                medication.name.lowercased().contains(self.searchText.lowercased()) ||
-                medication.description.lowercased().contains(self.searchText.lowercased())
-            }
-            self.isSearching = false
         }
     }
     
@@ -154,13 +275,83 @@ struct SearchView: View {
         }
         return samplePharmacies.first
     }
+}
+
+// MARK: - Medication Card Component
+struct MedicationCard: View {
+    let medication: Medication
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 16) {
+                // Medication Icon
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(statusColor(medication.status).opacity(0.1))
+                        .frame(width: 50, height: 50)
+                    
+                    Image(systemName: "pills.fill")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundColor(statusColor(medication.status))
+                }
+                
+                // Medication Info
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(medication.name)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.leading)
+                    
+                    Text(medication.description)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.leading)
+                    
+                    HStack(spacing: 8) {
+                        Text(medication.status.displayName)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(statusColor(medication.status))
+                            .cornerRadius(8)
+                        
+                        Text("Stok: \(medication.quantity)")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                Spacer()
+                
+                // Price and Arrow
+                VStack(alignment: .trailing, spacing: 8) {
+                    Text("₺\(String(format: "%.2f", medication.price))")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.primary)
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.blue)
+                }
+            }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white)
+                    .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
     
     private func statusColor(_ status: MedicationStatus) -> Color {
         switch status {
         case .available:
             return Color.blue
         case .forSale:
-            return Color(red: 0.85, green: 0.5, blue: 0.2)
+            return Color.green
         case .outOfStock:
             return Color.red
         case .reserved:

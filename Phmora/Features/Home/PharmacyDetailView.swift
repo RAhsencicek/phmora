@@ -9,7 +9,7 @@ struct PharmacyDetailView: View {
     
     // MARK: - State
     @State private var selectedTab = 0
-    @State private var showOfferSheet = false
+    @State private var showMedicationDetails = false
     @State private var selectedMedication: Medication? = nil
     @StateObject private var authService = AuthService.shared
     
@@ -199,13 +199,13 @@ struct PharmacyDetailView: View {
                     // Tüm ilaçlar
                     OwnPharmacyMedicationsView(medications: pharmacy.availableMedications) { medication in
                         selectedMedication = medication
-                        showOfferSheet = true
+                        showMedicationDetails = true
                     }
                 } else if selectedTab == 1 {
                     // Satışta olan ilaçlar
                     OwnPharmacyMedicationsView(medications: pharmacy.availableMedications.filter { $0.status == .forSale }) { medication in
                         selectedMedication = medication
-                        showOfferSheet = true
+                        showMedicationDetails = true
                     }
                 } else if selectedTab == 2 {
                     // Stok yönetimi
@@ -218,12 +218,12 @@ struct PharmacyDetailView: View {
                 } else if selectedTab == 1 {
                     PharmacyMedicationsView(medications: pharmacy.availableMedications) { medication in
                         selectedMedication = medication
-                        showOfferSheet = true
+                        showMedicationDetails = true
                     }
                 } else if selectedTab == 2 {
                     PharmacyMedicationsView(medications: pharmacy.availableMedications.filter { $0.status == .forSale }) { medication in
                         selectedMedication = medication
-                        showOfferSheet = true
+                        showMedicationDetails = true
                     }
                 }
             }
@@ -231,7 +231,7 @@ struct PharmacyDetailView: View {
             Spacer()
         }
         .background(Color(red: 0.98, green: 0.98, blue: 0.98))
-        .sheet(isPresented: $showOfferSheet) {
+        .sheet(isPresented: $showMedicationDetails) {
             if let medication = selectedMedication {
                 if isOwnPharmacy {
                     // Kendi eczanesi için özel detay görünümü (satın alma/teklif verme olmadan)

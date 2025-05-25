@@ -2,7 +2,7 @@ import SwiftUI
 import MapKit
 
 // MARK: - Medication Detail View
-/// Detailed view for medication information with purchase and offer actions
+/// Detailed view for medication information with purchase actions
 struct MedicationDetailView: View {
     // MARK: - Properties
     let medication: Medication
@@ -10,29 +10,36 @@ struct MedicationDetailView: View {
     
     // MARK: - State
     @State private var showPurchaseSheet = false
-    @State private var showOfferSheet = false
     
     // MARK: - Body
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Medication Image
-                    medicationImageView
-                    
-                    // Medication Information
+                VStack(alignment: .leading, spacing: 24) {
+                    // Medication Information Card
                     medicationInfoCard
                     
-                    // Pharmacy Information
+                    // Pharmacy Information Card
                     pharmacyInfoCard
                     
-                    // Action Buttons
+                    // Action Button
                     if medication.status == .forSale {
-                        actionButtonsView
+                        actionButtonView
                     }
                 }
                 .padding()
             }
+            .background(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color(red: 0.98, green: 0.99, blue: 1.0),
+                        Color(red: 0.95, green: 0.97, blue: 0.98)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            )
             .navigationTitle("İlaç Detayı")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showPurchaseSheet) {
@@ -40,137 +47,134 @@ struct MedicationDetailView: View {
                     showPurchaseSheet = false
                 }
             }
-            .sheet(isPresented: $showOfferSheet) {
-                OfferView(medication: medication) {
-                    showOfferSheet = false
-                }
-            }
         }
     }
     
     // MARK: - View Components
-    private var medicationImageView: some View {
-        Group {
-            if let _ = medication.imageURL {
-                Image(systemName: "pills.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 200)
-                    .frame(maxWidth: .infinity)
-                    .background(.regularMaterial)
-                    .cornerRadius(10)
-            } else {
-                Image(systemName: "pills.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 200)
-                    .frame(maxWidth: .infinity)
-                    .foregroundColor(Color(red: 0.4, green: 0.5, blue: 0.4))
-                    .padding()
-                    .background(.regularMaterial)
-                    .cornerRadius(10)
-            }
-        }
-    }
-    
     private var medicationInfoCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(medication.name)
-                .font(.title2)
-                .fontWeight(.bold)
-            
-            Text(medication.description)
-                .foregroundColor(.gray)
-            
-            HStack {
-                Label("Fiyat:", systemImage: "tag")
-                    .foregroundColor(.gray)
-                Text("\(String(format: "%.2f", medication.price)) TL")
-                    .fontWeight(.semibold)
+        VStack(alignment: .leading, spacing: 20) {
+            // Header
+            VStack(alignment: .leading, spacing: 8) {
+                Text(medication.name)
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(.primary)
+                
+                Text(medication.description)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.secondary)
+                    .lineLimit(3)
             }
             
-            HStack {
-                Label("Miktar:", systemImage: "number")
-                    .foregroundColor(.gray)
-                Text("\(medication.quantity)")
-                    .fontWeight(.semibold)
-            }
+            Divider()
+                .background(Color.gray.opacity(0.3))
             
-            if let expiryDate = medication.expiryDate {
-                HStack {
-                    Label("Son Kullanma:", systemImage: "calendar")
-                        .foregroundColor(.gray)
-                    Text(expiryDateFormatted(expiryDate))
-                        .fontWeight(.semibold)
+            // Information Grid
+            VStack(spacing: 16) {
+                InfoRowView(
+                    icon: "tag.fill",
+                    title: "Fiyat",
+                    value: "\(String(format: "%.2f", medication.price)) TL",
+                    color: Color(red: 0.2, green: 0.6, blue: 0.2)
+                )
+                
+                InfoRowView(
+                    icon: "number.square.fill",
+                    title: "Stok Miktarı",
+                    value: "\(medication.quantity) adet",
+                    color: medication.quantity <= 5 ? .orange : Color(red: 0.2, green: 0.4, blue: 0.8)
+                )
+                
+                if let expiryDate = medication.expiryDate {
+                    let isExpiringSoon = expiryDate.timeIntervalSinceNow < 30 * 24 * 60 * 60
+                    InfoRowView(
+                        icon: "calendar.circle.fill",
+                        title: "Son Kullanma Tarihi",
+                        value: expiryDateFormatted(expiryDate),
+                        color: isExpiringSoon ? .red : Color(red: 0.4, green: 0.6, blue: 0.8)
+                    )
                 }
-            }
-            
-            HStack {
-                Label("Durum:", systemImage: "circle.fill")
-                    .foregroundColor(.gray)
-                Text(medication.status.displayName)
-                    .fontWeight(.semibold)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 3)
-                    .background(statusColor(medication.status))
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
+                
+                InfoRowView(
+                    icon: "circle.fill",
+                    title: "Durum",
+                    value: medication.status.displayName,
+                    color: statusColor(medication.status)
+                )
             }
         }
-        .padding()
-        .background(.regularMaterial)
-        .cornerRadius(10)
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 6)
+        )
     }
     
     private var pharmacyInfoCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Eczane Bilgileri")
-                .font(.headline)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(.primary)
             
-            HStack {
-                Label(pharmacy.name, systemImage: "cross")
-                    .foregroundColor(.primary)
-            }
-            
-            HStack {
-                Label(pharmacy.fullAddress, systemImage: "location")
-                    .foregroundColor(.gray)
-            }
-            
-            HStack {
-                Label(pharmacy.phone, systemImage: "phone")
-                    .foregroundColor(.gray)
+            VStack(spacing: 12) {
+                InfoRowView(
+                    icon: "cross.circle.fill",
+                    title: "Eczane Adı",
+                    value: pharmacy.name,
+                    color: Color(red: 0.4, green: 0.6, blue: 0.8)
+                )
+                
+                InfoRowView(
+                    icon: "location.circle.fill",
+                    title: "Adres",
+                    value: pharmacy.fullAddress,
+                    color: Color(red: 0.6, green: 0.4, blue: 0.8)
+                )
+                
+                InfoRowView(
+                    icon: "phone.circle.fill",
+                    title: "Telefon",
+                    value: pharmacy.phone,
+                    color: Color(red: 0.8, green: 0.4, blue: 0.6)
+                )
             }
         }
-        .padding()
-        .background(.regularMaterial)
-        .cornerRadius(10)
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 6)
+        )
     }
     
-    private var actionButtonsView: some View {
-        HStack {
-            Button(action: {
-                showPurchaseSheet = true
-            }) {
-                Label("Satın Al", systemImage: "cart")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color(red: 0.4, green: 0.6, blue: 0.4))
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
+    private var actionButtonView: some View {
+        Button(action: {
+            showPurchaseSheet = true
+        }) {
+            HStack(spacing: 12) {
+                Image(systemName: "cart.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                
+                Text("Satın Al")
+                    .font(.system(size: 18, weight: .bold))
             }
-            
-            Button(action: {
-                showOfferSheet = true
-            }) {
-                Label("Teklif Ver", systemImage: "text.badge.plus")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.gray.opacity(0.2))
-                    .foregroundColor(Color(red: 0.4, green: 0.6, blue: 0.4))
-                    .cornerRadius(10)
-            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.2, green: 0.6, blue: 0.2),
+                        Color(red: 0.3, green: 0.7, blue: 0.3)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .foregroundColor(.white)
+            .cornerRadius(12)
+            .shadow(color: Color(red: 0.2, green: 0.6, blue: 0.2).opacity(0.4), radius: 8, x: 0, y: 4)
         }
+        .buttonStyle(PlainButtonStyle())
     }
     
     // MARK: - Helper Methods
@@ -186,7 +190,7 @@ struct MedicationDetailView: View {
         case .available:
             return Color.blue
         case .forSale:
-            return Color(red: 0.85, green: 0.5, blue: 0.2)
+            return Color(red: 0.2, green: 0.6, blue: 0.2)
         case .outOfStock:
             return Color.red
         case .reserved:
@@ -197,22 +201,60 @@ struct MedicationDetailView: View {
     }
 }
 
+// MARK: - Info Row View
+/// Bilgi satırı bileşeni
+struct InfoRowView: View {
+    let icon: String
+    let title: String
+    let value: String
+    let color: Color
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.15))
+                    .frame(width: 40, height: 40)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(color)
+            }
+            
+            // Content
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.secondary)
+                
+                Text(value)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.primary)
+                    .lineLimit(2)
+            }
+            
+            Spacer()
+        }
+    }
+}
+
 // MARK: - Preview
 #Preview {
     MedicationDetailView(
         medication: Medication(
-            name: "Örnek İlaç",
-            description: "Ağrı kesici",
+            name: "Parol 500mg",
+            description: "Ağrı kesici ve ateş düşürücü ilaç",
             price: 25.90,
             quantity: 10,
-            expiryDate: Date(),
+            expiryDate: Calendar.current.date(byAdding: .month, value: 6, to: Date()),
             imageURL: nil,
             status: .forSale
         ),
         pharmacy: Pharmacy(
-            name: "Örnek Eczane",
-            address: "Örnek Adres",
-            phone: "0424 000 0000",
+            name: "Sağlık Eczanesi",
+            address: "Merkez Mahallesi, Atatürk Caddesi No:15",
+            phone: "0424 123 4567",
             coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
             availableMedications: []
         )

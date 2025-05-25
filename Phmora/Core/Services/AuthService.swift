@@ -7,12 +7,12 @@ class AuthService {
     
     private init() {}
     
-    func login(email: String, password: String) -> AnyPublisher<LoginResponse, Error> {
+    func login(pharmacistId: String, password: String) -> AnyPublisher<LoginResponse, Error> {
         guard let url = URL(string: "\(baseURL)/auth/login") else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
         
-        let loginRequest = LoginRequest(email: email, password: password)
+        let loginRequest = LoginRequest(pharmacistId: pharmacistId, password: password)
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

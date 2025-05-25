@@ -101,13 +101,13 @@ protocol OpenFDAServiceProtocol {
 // MARK: - Service Implementation
 class OpenFDAService: ObservableObject, OpenFDAServiceProtocol {
     private let baseURL = "https://phamorabackend-production.up.railway.app"
-    private var authToken: String?
+    private var pharmacistId: String?
     
     @Published var isLoading = false
     @Published var errorMessage: String?
     
-    init(authToken: String? = nil) {
-        self.authToken = authToken
+    init(pharmacistId: String? = nil) {
+        self.pharmacistId = pharmacistId
     }
     
     func searchDrugs(query: String, limit: Int = 10) async throws -> DrugSearchResponse {
@@ -140,8 +140,8 @@ class OpenFDAService: ObservableObject, OpenFDAServiceProtocol {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         
-        if let token = authToken {
-            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        if let id = pharmacistId {
+            request.addValue(id, forHTTPHeaderField: "pharmacistId")
         }
         
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -195,8 +195,8 @@ class OpenFDAService: ObservableObject, OpenFDAServiceProtocol {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         
-        if let token = authToken {
-            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        if let id = pharmacistId {
+            request.addValue(id, forHTTPHeaderField: "pharmacistId")
         }
         
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -255,8 +255,8 @@ class OpenFDAService: ObservableObject, OpenFDAServiceProtocol {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         
-        if let token = authToken {
-            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        if let id = pharmacistId {
+            request.addValue(id, forHTTPHeaderField: "pharmacistId")
         }
         
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -315,8 +315,8 @@ class OpenFDAService: ObservableObject, OpenFDAServiceProtocol {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         
-        if let token = authToken {
-            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        if let id = pharmacistId {
+            request.addValue(id, forHTTPHeaderField: "pharmacistId")
         }
         
         let (data, response) = try await URLSession.shared.data(for: request)

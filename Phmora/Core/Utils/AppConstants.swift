@@ -82,7 +82,7 @@ struct AppConstants {
     
     // MARK: - User Defaults Keys
     struct UserDefaultsKeys {
-        static let userToken = "userToken"
+        static let pharmacistId = "pharmacistId"
         static let isFirstLaunch = "isFirstLaunch"
         static let selectedLanguage = "selectedLanguage"
     }

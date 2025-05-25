@@ -62,9 +62,10 @@ struct LoginView: View {
         VStack(spacing: 20) {
             // Giriş formu
             VStack(spacing: 15) {
-                TextField("Email", text: $viewModel.email)
+                TextField("Eczacı Kimlik No", text: $viewModel.pharmacistId)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .autocapitalization(.none)
+                    .keyboardType(.numberPad)
                     .disabled(viewModel.isLoading)
                 
                 SecureField("Şifre", text: $viewModel.password)
@@ -120,7 +121,7 @@ struct LoginView: View {
 }
 
 class LoginViewModel: ObservableObject {
-    @Published var email = ""
+    @Published var pharmacistId = ""
     @Published var password = ""
     @Published var isLoading = false
     @Published var errorMessage = ""
@@ -129,15 +130,15 @@ class LoginViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     func login() {
-        guard !email.isEmpty && !password.isEmpty else {
-            errorMessage = "Lütfen e-posta ve şifrenizi girin"
+        guard !pharmacistId.isEmpty && !password.isEmpty else {
+            errorMessage = "Lütfen eczacı kimlik no ve şifrenizi girin"
             return
         }
         
         isLoading = true
         errorMessage = ""
         
-        AuthService.shared.login(email: email, password: password)
+        AuthService.shared.login(pharmacistId: pharmacistId, password: password)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] (completion: Subscribers.Completion<Error>) in
                 self?.isLoading = false
@@ -156,7 +157,7 @@ class LoginViewModel: ObservableObject {
             }, receiveValue: { [weak self] (response: LoginResponse) in
                 self?.isLoggedIn = true
                 self?.errorMessage = ""
-                UserDefaults.standard.set(response.token, forKey: "userToken")
+                UserDefaults.standard.set(response.user.pharmacistId, forKey: AppConstants.UserDefaultsKeys.pharmacistId)
             })
             .store(in: &cancellables)
     }

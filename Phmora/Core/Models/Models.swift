@@ -36,13 +36,12 @@ struct Medication: Identifiable, Codable {
 
 // Auth Models
 struct LoginRequest: Codable {
-    let email: String
+    let pharmacistId: String
     let password: String
 }
 
 struct LoginResponse: Codable {
     let message: String
-    let token: String
     let user: UserResponse
 }
 

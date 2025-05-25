@@ -27,10 +27,11 @@ class NetworkManager: ObservableObject {
         request.httpMethod = method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        // Auth token ekle (gerekirse)
+        // Auth header ekle (gerekirse)
         if requiresAuth {
-            // TODO: Token management eklenecek
-            // request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            if let pharmacistId = UserDefaults.standard.pharmacistId {
+                request.setValue(pharmacistId, forHTTPHeaderField: "pharmacistId")
+            }
         }
         
         // Body ekle

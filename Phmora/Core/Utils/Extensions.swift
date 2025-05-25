@@ -139,20 +139,20 @@ extension View {
 
 // MARK: - UserDefaults Extensions
 extension UserDefaults {
-    /// Gets user token
-    var userToken: String? {
-        get { string(forKey: AppConstants.UserDefaultsKeys.userToken) }
-        set { set(newValue, forKey: AppConstants.UserDefaultsKeys.userToken) }
+    /// Gets pharmacist ID
+    var pharmacistId: String? {
+        get { string(forKey: AppConstants.UserDefaultsKeys.pharmacistId) }
+        set { set(newValue, forKey: AppConstants.UserDefaultsKeys.pharmacistId) }
     }
     
     /// Checks if user is logged in
     var isUserLoggedIn: Bool {
-        return userToken != nil && !userToken!.isEmpty
+        return pharmacistId != nil && !pharmacistId!.isEmpty
     }
     
     /// Removes user session data
     func clearUserSession() {
-        removeObject(forKey: AppConstants.UserDefaultsKeys.userToken)
+        removeObject(forKey: AppConstants.UserDefaultsKeys.pharmacistId)
     }
 }
 

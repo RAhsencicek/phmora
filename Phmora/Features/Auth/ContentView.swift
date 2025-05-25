@@ -67,9 +67,9 @@ struct LoadingScreen: View {
                 // Gradient Background
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        Color.blue.opacity(0.8),
-                        Color.purple.opacity(0.6),
-                        Color.cyan.opacity(0.4)
+                        Color.blue.opacity(0.4),
+                        Color.green.opacity(0.4),
+                        Color.black.opacity(0.3)
                     ]),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing

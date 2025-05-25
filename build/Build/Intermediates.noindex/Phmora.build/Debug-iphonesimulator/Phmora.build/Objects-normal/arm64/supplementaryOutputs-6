@@ -1,0 +1,24 @@
+"/Users/mac/phmora/Phmora/Core/Models/Models.swift":
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/Models.dia"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/Models.o"
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/Models.d"
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/Models.swiftconstvalues"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/Models.swiftdeps"
+"/Users/mac/phmora/Phmora/Core/Services/AuthService.swift":
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/AuthService.dia"
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/AuthService.d"
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/AuthService.swiftconstvalues"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/AuthService.o"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/AuthService.swiftdeps"
+"/Users/mac/phmora/Phmora/Features/Search/SearchView.swift":
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/SearchView.swiftconstvalues"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/SearchView.o"
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/SearchView.d"
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/SearchView.dia"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/SearchView.swiftdeps"
+"/Users/mac/phmora/Phmora/Features/Auth/ContentView.swift":
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/ContentView.dia"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/ContentView.o"
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/ContentView.d"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/ContentView.swiftdeps"
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/ContentView.swiftconstvalues"

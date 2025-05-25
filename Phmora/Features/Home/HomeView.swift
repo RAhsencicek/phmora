@@ -7,36 +7,57 @@ import MapKit
 /// - Interactive map with pharmacy annotations
 /// - Pharmacy detail sheets
 /// - Location-based services
+/// - Real-time data from backend API
 struct HomeView: View {
     // MARK: - Properties
     @Binding var showAddMedicationSheet: Bool
     
     // MARK: - State Management
     @StateObject private var locationManager = LocationManager()
+    @StateObject private var pharmacyViewModel = PharmacyViewModel()
     @State private var mapRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 38.6748, longitude: 39.2225), // Elazığ merkez koordinatları
-        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+        center: AppConstants.Map.defaultCenter,
+        span: AppConstants.Map.defaultSpan
     )
     @State private var selectedPharmacy: Pharmacy? = nil
     @State private var showPharmacyDetails = false
-    @State private var currentUserPharmacyIndex = 0 // Kullanıcının kendi eczanesinin indeksi
     @State private var initialLocationSet = false
-    
-    // MARK: - Mock Data (TODO: Replace with API data)
-    @State private var pharmacies: [Pharmacy] = PharmacyMockData.pharmacies
     
     // MARK: - Body
     var body: some View {
         ZStack(alignment: .bottom) {
-            VStack {
-                // Map Content
+            if pharmacyViewModel.isLoading {
+                VStack {
+                    ProgressView("Eczaneler yükleniyor...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            } else if let errorMessage = pharmacyViewModel.errorMessage {
+                VStack(spacing: 16) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.largeTitle)
+                        .foregroundColor(.orange)
+                    Text(errorMessage)
+                        .multilineTextAlignment(.center)
+                    Button("Tekrar Dene") {
+                        Task {
+                            await pharmacyViewModel.refreshData()
+                        }
+                    }
+                    .primaryButtonStyle()
+                    .padding(.horizontal)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                VStack {
+                    // Map Content
                     PharmaciesMapView(
-                        pharmacies: pharmacies,
+                        pharmacies: pharmacyViewModel.filteredPharmacies,
                         selectedPharmacy: $selectedPharmacy,
                         showPharmacyDetails: $showPharmacyDetails,
                         showAddMedicationSheet: $showAddMedicationSheet,
                         region: $mapRegion
                     )
+                }
             }
         }
         .sheet(isPresented: $showPharmacyDetails, onDismiss: {
@@ -56,6 +77,9 @@ struct HomeView: View {
             // Sadece ilk konum alındığında haritayı güncelle
             if !initialLocationSet, let location = newLocation {
                 updateMapRegion(with: location)
+                Task {
+                    await pharmacyViewModel.loadNearbyPharmacies(location: location)
+                }
                 initialLocationSet = true
             }
         }
@@ -64,6 +88,13 @@ struct HomeView: View {
     // MARK: - Private Methods
     private func setupView() {
         locationManager.requestLocationPermission()
+        
+        // Eğer konum izni yoksa veya konum alınamıyorsa tüm eczaneleri yükle
+        if locationManager.authorizationStatus == .denied || locationManager.location == nil {
+            Task {
+                await pharmacyViewModel.loadPharmacies()
+            }
+        }
     }
     
     private func updateMapRegion(with location: CLLocation) {

@@ -1,0 +1,24 @@
+"/Users/mac/phmora/Phmora/Core/Services/OpenFDAService.swift":
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/OpenFDAService.dia"
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/OpenFDAService.swiftconstvalues"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/OpenFDAService.o"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/OpenFDAService.swiftdeps"
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/OpenFDAService.d"
+"/Users/mac/phmora/Phmora/Features/Offers/OfferView.swift":
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/OfferView.dia"
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/OfferView.d"
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/OfferView.swiftconstvalues"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/OfferView.o"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/OfferView.swiftdeps"
+"/Users/mac/phmora/Phmora/App/PhmoraApp.swift":
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PhmoraApp.swiftconstvalues"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PhmoraApp.o"
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PhmoraApp.d"
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PhmoraApp.dia"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PhmoraApp.swiftdeps"
+"/Users/mac/phmora/Phmora/Features/Search/FDADrugSearchView.swift":
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/FDADrugSearchView.swiftdeps"
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/FDADrugSearchView.d"
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/FDADrugSearchView.dia"
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/FDADrugSearchView.swiftconstvalues"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/FDADrugSearchView.o"

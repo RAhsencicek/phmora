@@ -2,29 +2,127 @@ import SwiftUI
 import MapKit
 import Foundation
 
-struct Pharmacy: Identifiable, Equatable {
-    var id = UUID()
+struct Pharmacy: Identifiable, Codable, Equatable {
+    let id: String
     let name: String
-    let address: String
+    let address: PharmacyAddress
+    let location: PharmacyLocation
     let phone: String
-    let coordinate: CLLocationCoordinate2D
-    var availableMedications: [Medication]
+    let email: String?
+    let licenseNumber: String
+    let isActive: Bool
+    let isOnDuty: Bool
+    let workingHours: WorkingHours?
+    let rating: PharmacyRating?
+    let description: String?
+    let services: [String]?
+    let imageUrl: String?
+    let availableMedications: [Medication]
+    let createdAt: Date
+    let updatedAt: Date
     
+    // Computed property for CLLocationCoordinate2D
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(
+            latitude: location.coordinates[1],
+            longitude: location.coordinates[0]
+        )
+    }
+    
+    // Computed property for full address string (backward compatibility)
+    var fullAddress: String {
+        return address.fullAddress ?? "\(address.street), \(address.district)/\(address.city)"
+    }
+    
+    // Legacy init for backward compatibility with mock data
+    init(name: String, address: String, phone: String, coordinate: CLLocationCoordinate2D, availableMedications: [Medication]) {
+        self.id = UUID().uuidString
+        self.name = name
+        self.address = PharmacyAddress(street: address, city: "Elazığ", district: "Merkez", postalCode: nil, fullAddress: address)
+        self.location = PharmacyLocation(type: "Point", coordinates: [coordinate.longitude, coordinate.latitude])
+        self.phone = phone
+        self.email = nil
+        self.licenseNumber = "ECZ-\(Int.random(in: 10000...99999))"
+        self.isActive = true
+        self.isOnDuty = true
+        self.workingHours = nil
+        self.rating = nil
+        self.description = nil
+        self.services = nil
+        self.imageUrl = nil
+        self.availableMedications = availableMedications
+        self.createdAt = Date()
+        self.updatedAt = Date()
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case name, address, location, phone, email
+        case licenseNumber, isActive, isOnDuty
+        case workingHours, rating, description, services
+        case imageUrl, availableMedications
+        case createdAt, updatedAt
+    }
+    
+    // Equatable implementation
     static func == (lhs: Pharmacy, rhs: Pharmacy) -> Bool {
         return lhs.id == rhs.id
     }
 }
 
+struct PharmacyAddress: Codable {
+    let street: String
+    let city: String
+    let district: String
+    let postalCode: String?
+    let fullAddress: String?
+}
+
+struct PharmacyLocation: Codable {
+    let type: String
+    let coordinates: [Double] // [longitude, latitude]
+}
+
+struct WorkingHours: Codable {
+    let monday: DayHours?
+    let tuesday: DayHours?
+    let wednesday: DayHours?
+    let thursday: DayHours?
+    let friday: DayHours?
+    let saturday: DayHours?
+    let sunday: DayHours?
+}
+
+struct DayHours: Codable {
+    let open: String?
+    let close: String?
+}
+
+struct PharmacyRating: Codable {
+    let average: Double
+    let count: Int
+}
+
 // Medication Models
 enum MedicationStatus: String, Codable, CaseIterable {
-    case available = "Mevcut"
-    case forSale = "Satılık"
-    case reserved = "Rezerve"
-    case sold = "Satıldı"
+    case available = "available"
+    case forSale = "forSale"
+    case outOfStock = "outOfStock"
+    case reserved = "reserved"
+    case sold = "sold"
+    
+    var displayName: String {
+        switch self {
+        case .available: return "Mevcut"
+        case .forSale: return "Satışta"
+        case .outOfStock: return "Stokta Yok"
+        case .reserved: return "Rezerve"
+        case .sold: return "Satıldı"
+        }
+    }
 }
 
 struct Medication: Identifiable, Codable {
-    let id = UUID()
     let name: String
     let description: String
     let price: Double
@@ -32,6 +130,25 @@ struct Medication: Identifiable, Codable {
     let expiryDate: Date?
     let imageURL: URL?
     let status: MedicationStatus
+    
+    // Computed property for Identifiable
+    var id: String {
+        return "\(name)-\(description.hashValue)"
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case name, description, price, quantity, expiryDate, imageURL, status
+    }
+    
+    init(name: String, description: String, price: Double, quantity: Int, expiryDate: Date?, imageURL: URL?, status: MedicationStatus) {
+        self.name = name
+        self.description = description
+        self.price = price
+        self.quantity = quantity
+        self.expiryDate = expiryDate
+        self.imageURL = imageURL
+        self.status = status
+    }
 }
 
 // Auth Models

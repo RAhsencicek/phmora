@@ -1,0 +1,152 @@
+{
+  "source": "/Users/mac/phmora/Phmora/Features/Auth/ContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Auth Screen",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 33
+        }
+      },
+      {
+        "comment": "",
+        "key": "Giriş",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 34
+        }
+      },
+      {
+        "comment": "",
+        "key": "Kayıt",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "Eczacı Kimlik No",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 65
+        }
+      },
+      {
+        "comment": "",
+        "key": "Şifre",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 71
+        }
+      },
+      {
+        "comment": "",
+        "key": "Şifremi Unuttum",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 75
+        }
+      },
+      {
+        "comment": "",
+        "key": "Giriş Yap",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 92
+        }
+      },
+      {
+        "comment": "",
+        "key": "Başarılı",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 236
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ad",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 183
+        }
+      },
+      {
+        "comment": "",
+        "key": "Soyad",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 186
+        }
+      },
+      {
+        "comment": "",
+        "key": "Eczacı Kimlik No",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 189
+        }
+      },
+      {
+        "comment": "",
+        "key": "E-posta",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 192
+        }
+      },
+      {
+        "comment": "",
+        "key": "Telefon",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 195
+        }
+      },
+      {
+        "comment": "",
+        "key": "Şifre",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 198
+        }
+      },
+      {
+        "comment": "",
+        "key": "Şifre Tekrar",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 201
+        }
+      },
+      {
+        "comment": "",
+        "key": "Kayıt Ol",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 223
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tamam",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 237
+        }
+      },
+      {
+        "comment": "",
+        "key": "Kayıt başarılı!",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 239
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,168 +1,88 @@
 import SwiftUI
-import Combine
 
 struct NetworkTestView: View {
-    @State private var medicines: [Medicine] = []
-    @State private var isLoading = false
-    @State private var errorMessage = ""
-    @State private var successMessage = ""
-    @State private var cancellables = Set<AnyCancellable>()
-    
-    private let baseURL = "https://phamorabackend-production.up.railway.app/api"
+    @StateObject private var pharmacyService = PharmacyService.shared
+    @State private var testResults: [String] = []
     
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                Text("🧪 Backend API Test")
+                Text("Backend API Test")
                     .font(.title)
                     .fontWeight(.bold)
-                    .padding()
                 
-                Button(action: testAPI) {
-                    HStack {
-                        if isLoading {
-                            ProgressView()
-                                .scaleEffect(0.8)
-                                .foregroundColor(.white)
-                        }
-                        Text(isLoading ? "Test Ediliyor..." : "Backend'i Test Et")
-                            .fontWeight(.semibold)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
+                if pharmacyService.isLoading {
+                    ProgressView("API Test Çalışıyor...")
+                        .scaleEffect(1.2)
                 }
-                .disabled(isLoading)
-                .padding(.horizontal)
                 
-                if !errorMessage.isEmpty {
-                    Text(errorMessage)
+                if let errorMessage = pharmacyService.errorMessage {
+                    Text("❌ Hata: \(errorMessage)")
                         .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
                         .padding()
-                        .background(Color.red.opacity(0.1))
-                        .cornerRadius(8)
-                        .padding(.horizontal)
                 }
                 
-                if !successMessage.isEmpty {
-                    Text(successMessage)
-                        .foregroundColor(.green)
-                        .padding()
-                        .background(Color.green.opacity(0.1))
-                        .cornerRadius(8)
-                        .padding(.horizontal)
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("📊 Test Sonuçları:")
+                        .font(.headline)
+                    
+                    Text("Toplam Eczane: \(pharmacyService.pharmacies.count)")
+                    Text("İlaçlı Eczane: \(pharmacyService.pharmacies.filter { !$0.availableMedications.isEmpty }.count)")
+                    Text("Aktif Eczane: \(pharmacyService.pharmacies.filter { $0.isActive }.count)")
+                    Text("Nöbetçi Eczane: \(pharmacyService.pharmacies.filter { $0.isOnDuty }.count)")
                 }
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(10)
                 
-                if !medicines.isEmpty {
-                    List(medicines) { medicine in
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(medicine.name)
+                if !pharmacyService.pharmacies.isEmpty {
+                    List(pharmacyService.pharmacies.prefix(5), id: \.id) { pharmacy in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(pharmacy.name)
                                 .font(.headline)
-                                .fontWeight(.semibold)
-                            
-                            Text(medicine.manufacturer)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            
-                            HStack {
-                                Text(medicine.dosageFormDisplayName)
-                                    .font(.caption)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(Color.blue.opacity(0.1))
-                                    .cornerRadius(6)
-                                
-                                Spacer()
-                                
-                                if let price = medicine.price {
-                                    Text(price.formattedPrice)
-                                        .font(.caption)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.green)
-                                }
-                            }
-                            
-                            if let strength = medicine.strength {
-                                Text("Doz: \(strength)")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
+                            Text(pharmacy.fullAddress)
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                            Text("İlaç: \(pharmacy.availableMedications.count)")
+                                .font(.caption)
+                                .foregroundColor(.blue)
                         }
-                        .padding(.vertical, 4)
+                        .padding(.vertical, 2)
                     }
+                    .frame(maxHeight: 200)
+                }
+                
+                VStack(spacing: 10) {
+                    Button("🔄 Tüm Eczaneleri Getir") {
+                        pharmacyService.fetchAllPharmacies()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    
+                    Button("📍 Yakın Eczaneleri Getir") {
+                        // Elazığ merkez koordinatları
+                        pharmacyService.fetchNearbyPharmacies(
+                            latitude: 38.6748,
+                            longitude: 39.2225,
+                            radius: 5000
+                        )
+                    }
+                    .buttonStyle(.bordered)
+                    
+                    Button("🏙️ Elazığ Eczaneleri") {
+                        pharmacyService.fetchPharmacies(city: "Elazığ")
+                    }
+                    .buttonStyle(.bordered)
                 }
                 
                 Spacer()
             }
+            .padding()
             .navigationTitle("API Test")
-        }
-    }
-    
-    private func testAPI() {
-        isLoading = true
-        errorMessage = ""
-        successMessage = ""
-        medicines = []
-        
-        // Direct API call without complex NetworkManager
-        guard let url = URL(string: "\(baseURL)/medicines?limit=5") else {
-            errorMessage = "❌ Geçersiz URL"
-            isLoading = false
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        URLSession.shared
-            .dataTaskPublisher(for: request)
-            .tryMap { data, response -> Data in
-                guard let httpResponse = response as? HTTPURLResponse else {
-                    throw URLError(.badServerResponse)
-                }
-                
-                print("🌐 Status Code: \(httpResponse.statusCode)")
-                
-                if let responseString = String(data: data, encoding: .utf8) {
-                    print("🌐 Response: \(responseString)")
-                }
-                
-                if httpResponse.statusCode >= 400 {
-                    throw URLError(.badServerResponse)
-                }
-                
-                return data
+            .onAppear {
+                pharmacyService.fetchAllPharmacies()
             }
-            .decode(type: APIResponse<[Medicine]>.self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
-            .sink(
-                receiveCompletion: { completion in
-                    isLoading = false
-                    if case .failure(let error) = completion {
-                        errorMessage = "❌ Hata: \(error.localizedDescription)"
-                        print("🔴 Error: \(error)")
-                    }
-                },
-                receiveValue: { response in
-                    if response.success {
-                        medicines = response.data ?? []
-                        successMessage = "✅ Başarılı! \(medicines.count) ilaç yüklendi"
-                        
-                        // Konsola detaylı log
-                        print("✅ API Test Başarılı!")
-                        print("📊 Toplam İlaç: \(medicines.count)")
-                        for medicine in medicines {
-                            print("💊 \(medicine.name) - \(medicine.manufacturer)")
-                        }
-                    } else {
-                        errorMessage = "❌ API Hatası: \(response.message ?? "Bilinmeyen hata")"
-                    }
-                }
-            )
-            .store(in: &cancellables)
+        }
     }
 }
 

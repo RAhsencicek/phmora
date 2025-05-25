@@ -10,7 +10,7 @@ class NetworkManager: ObservableObject {
     
     private init() {}
     
-    // Generic request method
+    // Generic request method for APIResponse format
     func performRequest<T: Codable>(
         endpoint: String,
         method: HTTPMethod = .GET,
@@ -68,7 +68,25 @@ class NetworkManager: ObservableObject {
                 
                 return data
             }
-            .decode(type: APIResponse<T>.self, decoder: JSONDecoder())
+            .tryMap { data in
+                let decoder = JSONDecoder()
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                decoder.dateDecodingStrategy = .formatted(formatter)
+                
+                // Önce APIResponse formatını dene
+                if let apiResponse = try? decoder.decode(APIResponse<T>.self, from: data) {
+                    return apiResponse
+                }
+                
+                // Eğer APIResponse formatında değilse, direkt data'yı decode et
+                if let directData = try? decoder.decode(T.self, from: data) {
+                    return APIResponse<T>(success: true, message: nil, data: directData, pagination: nil)
+                }
+                
+                // Hiçbiri çalışmazsa hata fırlat
+                throw APIError(message: "Veri formatı tanınmıyor", errors: nil)
+            }
             .mapError { error in
                 if let apiError = error as? APIError {
                     return apiError

@@ -1,0 +1,24 @@
+"/Users/mac/phmora/Phmora/Core/Services/PharmacyService.swift":
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyService.swiftconstvalues"
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyService.d"
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyService.dia"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyService.o"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyService.swiftdeps"
+"/Users/mac/phmora/Phmora/Core/Services/LocationManager.swift":
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/LocationManager.d"
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/LocationManager.swiftconstvalues"
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/LocationManager.dia"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/LocationManager.o"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/LocationManager.swiftdeps"
+"/Users/mac/phmora/Phmora/Features/Home/PharmacyInfoView.swift":
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyInfoView.swiftconstvalues"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyInfoView.swiftdeps"
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyInfoView.d"
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyInfoView.dia"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyInfoView.o"
+"/Users/mac/phmora/Phmora/Core/Services/NetworkManager.swift":
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/NetworkManager.d"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/NetworkManager.swiftdeps"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/NetworkManager.o"
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/NetworkManager.swiftconstvalues"
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/NetworkManager.dia"

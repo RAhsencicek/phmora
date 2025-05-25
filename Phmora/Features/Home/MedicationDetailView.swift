@@ -108,7 +108,7 @@ struct MedicationDetailView: View {
             HStack {
                 Label("Durum:", systemImage: "circle.fill")
                     .foregroundColor(.gray)
-                Text(medication.status.rawValue)
+                Text(medication.status.displayName)
                     .fontWeight(.semibold)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 3)
@@ -133,7 +133,7 @@ struct MedicationDetailView: View {
             }
             
             HStack {
-                Label(pharmacy.address, systemImage: "location")
+                Label(pharmacy.fullAddress, systemImage: "location")
                     .foregroundColor(.gray)
             }
             
@@ -187,6 +187,8 @@ struct MedicationDetailView: View {
             return Color.blue
         case .forSale:
             return Color(red: 0.85, green: 0.5, blue: 0.2)
+        case .outOfStock:
+            return Color.red
         case .reserved:
             return Color.purple
         case .sold:

@@ -1,0 +1,24 @@
+"/Users/mac/phmora/Phmora/Features/Profile/ProfileView.swift":
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/ProfileView.swiftconstvalues"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/ProfileView.o"
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/ProfileView.d"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/ProfileView.swiftdeps"
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/ProfileView.dia"
+"/Users/mac/phmora/Phmora/Features/FDA/FDAAdverseEventsView.swift":
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/FDAAdverseEventsView.d"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/FDAAdverseEventsView.o"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/FDAAdverseEventsView.swiftdeps"
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/FDAAdverseEventsView.swiftconstvalues"
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/FDAAdverseEventsView.dia"
+"/Users/mac/phmora/Phmora/Features/Home/PharmacyMedicationsView.swift":
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyMedicationsView.d"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyMedicationsView.o"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyMedicationsView.swiftdeps"
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyMedicationsView.swiftconstvalues"
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyMedicationsView.dia"
+"/Users/mac/phmora/Phmora/Features/Home/PharmacyDetailView.swift":
+  dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyDetailView.d"
+  const-values: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyDetailView.swiftconstvalues"
+  swift-dependencies: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyDetailView.swiftdeps"
+  diagnostics: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyDetailView.dia"
+  object: "/Users/mac/phmora/build/Build/Intermediates.noindex/Phmora.build/Debug-iphonesimulator/Phmora.build/Objects-normal/arm64/PharmacyDetailView.o"

@@ -1,0 +1,80 @@
+{
+  "source": "/Users/mac/phmora/Phmora/Features/Profile/ProfileView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Profilim",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 120
+        }
+      },
+      {
+        "comment": "",
+        "key": "Kişisel Bilgiler",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 40
+        }
+      },
+      {
+        "comment": "",
+        "key": "İşlem İstatistikleri",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 62
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ayarlar",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 76
+        }
+      },
+      {
+        "comment": "",
+        "key": "Çıkış Yap",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 97
+        }
+      },
+      {
+        "comment": "",
+        "key": "Çıkış Yap",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hesabınızdan çıkış yapmak istediğinize emin misiniz?",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "Çıkış Yap",
+        "location": {
+          "startingColumn": 58,
+          "startingLine": 111
+        }
+      },
+      {
+        "comment": "",
+        "key": "İptal",
+        "location": {
+          "startingColumn": 55,
+          "startingLine": 114
+        }
+      }
+    ]
+  },
+  "version": 1
+}

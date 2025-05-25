@@ -97,7 +97,7 @@ struct SearchView: View {
                                         .font(.subheadline)
                                         .bold()
                                     
-                                    Text(medication.status.rawValue)
+                                    Text(medication.status.displayName)
                                         .font(.caption)
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 3)
@@ -161,6 +161,8 @@ struct SearchView: View {
             return Color.blue
         case .forSale:
             return Color(red: 0.85, green: 0.5, blue: 0.2)
+        case .outOfStock:
+            return Color.red
         case .reserved:
             return Color.purple
         case .sold:

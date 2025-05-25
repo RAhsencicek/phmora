@@ -21,7 +21,7 @@ struct PharmacyDetailView: View {
                 .fontWeight(.bold)
                 .foregroundColor(Color(red: 0.3, green: 0.4, blue: 0.3))
             
-            Text(pharmacy.address)
+            Text(pharmacy.fullAddress)
                 .font(.subheadline)
             
             Text(pharmacy.phone)

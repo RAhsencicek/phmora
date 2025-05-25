@@ -8,6 +8,11 @@ class AuthService: ObservableObject {
     @Published var currentUser: UserResponse?
     @Published var isLoggedIn: Bool = false
     
+    // Computed property for pharmacistId
+    var currentUserPharmacistId: String? {
+        return currentUser?.pharmacistId
+    }
+    
     private init() {}
     
     func login(pharmacistId: String, password: String) -> AnyPublisher<LoginResponse, Error> {
@@ -27,54 +32,43 @@ class AuthService: ObservableObject {
             return Fail(error: error).eraseToAnyPublisher()
         }
         
-        return URLSession.shared
-            .dataTaskPublisher(for: request)
-            .tryMap { data, response in
-                guard let httpResponse = response as? HTTPURLResponse else {
-                    throw URLError(.badServerResponse)
-                }
-                
-                if let responseString = String(data: data, encoding: .utf8) {
-                    print("Response body: \(responseString)")
-                }
-                
-                if httpResponse.statusCode != 200 {
-                    let decoder = JSONDecoder()
-                    let apiError = try decoder.decode(APIError.self, from: data)
-                    
-                    switch httpResponse.statusCode {
-                    case 400:
-                        throw apiError
-                    case 401:
-                        throw apiError
-                    case 403:
-                        throw apiError
-                    case 500:
-                        throw apiError
-                    default:
-                        throw apiError
-                    }
-                }
-                
-                return data
-            }
+        return URLSession.shared.dataTaskPublisher(for: request)
+            .map(\.data)
             .decode(type: LoginResponse.self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
-            .handleEvents(receiveOutput: { [weak self] loginResponse in
-                // Giriş başarılı olduğunda kullanıcı bilgilerini sakla
-                self?.currentUser = loginResponse.user
-                self?.isLoggedIn = true
+            .handleEvents(receiveOutput: { [weak self] response in
+                DispatchQueue.main.async {
+                    self?.currentUser = response.user
+                    self?.isLoggedIn = true
+                    // UserDefaults'a kaydet
+                    UserDefaults.standard.set(response.user.pharmacistId, forKey: "pharmacistId")
+                }
             })
             .eraseToAnyPublisher()
     }
     
     func logout() {
-        currentUser = nil
-        isLoggedIn = false
+        DispatchQueue.main.async { [weak self] in
+            // Kullanıcı bilgilerini temizle
+            self?.currentUser = nil
+            self?.isLoggedIn = false
+            
+            // UserDefaults'tan tüm kullanıcı verilerini temizle
+            UserDefaults.standard.removeObject(forKey: "pharmacistId")
+            UserDefaults.standard.removeObject(forKey: "userToken")
+            UserDefaults.standard.synchronize()
+            
+            // Diğer servisleri de temizle
+            PharmacyService.shared.clearData()
+        }
     }
     
-    // Giriş yapan kullanıcının eczane ID'sini döndür
-    var currentUserPharmacistId: String? {
-        return currentUser?.pharmacistId
+    func checkLoginStatus() {
+        if let savedPharmacistId = UserDefaults.standard.string(forKey: "pharmacistId") {
+            // Burada normalde token doğrulaması yapılabilir
+            // Şimdilik basit bir kontrol yapıyoruz
+            DispatchQueue.main.async { [weak self] in
+                self?.isLoggedIn = true
+            }
+        }
     }
 } 

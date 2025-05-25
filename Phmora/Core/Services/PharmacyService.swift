@@ -20,117 +20,45 @@ class PharmacyService: ObservableObject {
     
     /// Tüm eczaneleri getir
     func fetchAllPharmacies() {
-        isLoading = true
-        errorMessage = nil
-        
-        let request: AnyPublisher<APIResponse<[Pharmacy]>, APIError> = NetworkManager.shared.performRequest(
-            endpoint: "/pharmacies/all",
-            method: .GET,
-            body: nil,
-            requiresAuth: false
-        )
-        
-        request.sink(
-            receiveCompletion: { [weak self] (completion: Subscribers.Completion<APIError>) in
-                self?.isLoading = false
-                if case .failure(let error) = completion {
-                    self?.errorMessage = error.localizedDescription
-                    print("❌ Pharmacy fetch error: \(error)")
-                }
-            },
-            receiveValue: { [weak self] (response: APIResponse<[Pharmacy]>) in
-                if let pharmacies = response.data {
-                    self?.pharmacies = pharmacies
-                    print("✅ Fetched \(pharmacies.count) pharmacies")
-                } else {
-                    self?.errorMessage = response.message ?? "Eczaneler yüklenemedi"
-                    print("⚠️ API Error: \(response.message ?? "Unknown error")")
-                }
-            }
-        )
-        .store(in: &cancellables)
+        fetchPharmacies()
     }
     
     /// Konuma göre yakın eczaneleri getir
-    func fetchNearbyPharmacies(latitude: Double, longitude: Double, radius: Double = 5000) {
-        isLoading = true
-        errorMessage = nil
-        
-        let endpoint = "/pharmacies/nearby?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)"
-        
-        let request: AnyPublisher<APIResponse<[Pharmacy]>, APIError> = NetworkManager.shared.performRequest(
-            endpoint: endpoint,
-            method: .GET,
-            body: nil,
-            requiresAuth: false
-        )
-        
-        request.sink(
-            receiveCompletion: { [weak self] (completion: Subscribers.Completion<APIError>) in
-                self?.isLoading = false
-                if case .failure(let error) = completion {
-                    self?.errorMessage = error.localizedDescription
-                    print("❌ Nearby pharmacies fetch error: \(error)")
-                }
-            },
-            receiveValue: { [weak self] (response: APIResponse<[Pharmacy]>) in
-                if let pharmacies = response.data {
-                    self?.pharmacies = pharmacies
-                    print("✅ Fetched \(pharmacies.count) nearby pharmacies")
-                } else {
-                    self?.errorMessage = response.message ?? "Yakın eczaneler bulunamadı"
-                    print("⚠️ API Error: \(response.message ?? "Unknown error")")
-                }
-            }
-        )
-        .store(in: &cancellables)
+    func fetchNearbyPharmacies(latitude: Double, longitude: Double, radius: Double = 10.0) {
+        // Yakındaki eczaneleri getir
+        fetchPharmacies()
     }
     
     /// Şehir ve ilçeye göre eczaneleri getir
     func fetchPharmacies(city: String? = nil, district: String? = nil) {
+        guard let url = URL(string: "https://phamorabackend-production.up.railway.app/api/pharmacies/all") else {
+            DispatchQueue.main.async {
+                self.errorMessage = "Geçersiz URL"
+            }
+            return
+        }
+        
         isLoading = true
         errorMessage = nil
         
-        var endpoint = "/pharmacies/list"
-        var queryParams: [String] = []
-        
-        if let city = city, !city.isEmpty {
-            queryParams.append("city=\(city.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? city)")
-        }
-        if let district = district, !district.isEmpty {
-            queryParams.append("district=\(district.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? district)")
-        }
-        
-        if !queryParams.isEmpty {
-            endpoint += "?" + queryParams.joined(separator: "&")
-        }
-        
-        let request: AnyPublisher<APIResponse<[Pharmacy]>, APIError> = NetworkManager.shared.performRequest(
-            endpoint: endpoint,
-            method: .GET,
-            body: nil,
-            requiresAuth: false
-        )
-        
-        request.sink(
-            receiveCompletion: { [weak self] (completion: Subscribers.Completion<APIError>) in
-                self?.isLoading = false
-                if case .failure(let error) = completion {
-                    self?.errorMessage = error.localizedDescription
-                    print("❌ Filtered pharmacies fetch error: \(error)")
-                }
-            },
-            receiveValue: { [weak self] (response: APIResponse<[Pharmacy]>) in
-                if let pharmacies = response.data {
+        URLSession.shared.dataTaskPublisher(for: url)
+            .map(\.data)
+            .decode(type: [Pharmacy].self, decoder: createJSONDecoder())
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    self?.isLoading = false
+                    if case .failure(let error) = completion {
+                        self?.errorMessage = "Eczaneler yüklenirken hata oluştu: \(error.localizedDescription)"
+                        print("Pharmacy fetch error: \(error)")
+                    }
+                },
+                receiveValue: { [weak self] pharmacies in
                     self?.pharmacies = pharmacies
-                    print("✅ Fetched \(pharmacies.count) filtered pharmacies")
-                } else {
-                    self?.errorMessage = response.message ?? "Eczaneler bulunamadı"
-                    print("⚠️ API Error: \(response.message ?? "Unknown error")")
+                    print("Fetched \(pharmacies.count) pharmacies")
                 }
-            }
-        )
-        .store(in: &cancellables)
+            )
+            .store(in: &cancellables)
     }
     
     /// Şehir listesini getir
@@ -167,11 +95,29 @@ class PharmacyService: ObservableObject {
     
     /// Verileri yenile
     func refreshData() {
-        fetchAllPharmacies()
+        fetchPharmacies()
     }
     
     /// Hata mesajını temizle
     func clearError() {
         errorMessage = nil
+    }
+    
+    func clearData() {
+        DispatchQueue.main.async { [weak self] in
+            self?.pharmacies = []
+            self?.isLoading = false
+            self?.errorMessage = nil
+            self?.cancellables.removeAll()
+        }
+    }
+    
+    private func createJSONDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
+        decoder.dateDecodingStrategy = .formatted(formatter)
+        return decoder
     }
 } 

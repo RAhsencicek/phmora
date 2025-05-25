@@ -10,11 +10,15 @@ import Combine
 
 struct ContentView: View {
     @State private var showLoadingScreen = true
+    @StateObject private var authService = AuthService.shared
     
     var body: some View {
         ZStack {
             if showLoadingScreen {
                 LoadingScreen()
+                    .transition(.opacity)
+            } else if authService.isLoggedIn {
+                MainView()
                     .transition(.opacity)
             } else {
                 LoginScreen()
@@ -26,6 +30,24 @@ struct ContentView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
                 withAnimation(.easeInOut(duration: 0.8)) {
                     showLoadingScreen = false
+                }
+            }
+            
+            // Giriş durumunu kontrol et
+            authService.checkLoginStatus()
+        }
+        .onChange(of: authService.isLoggedIn) { isLoggedIn in
+            // Kullanıcı çıkış yaptığında loading ekranını göster
+            if !isLoggedIn && !showLoadingScreen {
+                withAnimation(.easeInOut(duration: 0.8)) {
+                    showLoadingScreen = true
+                }
+                
+                // 2 saniye sonra login ekranına geç
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    withAnimation(.easeInOut(duration: 0.8)) {
+                        showLoadingScreen = false
+                    }
                 }
             }
         }

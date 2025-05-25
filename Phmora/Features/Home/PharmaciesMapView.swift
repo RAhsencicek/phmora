@@ -14,6 +14,7 @@ struct PharmaciesMapView: View {
     // MARK: - State
     @State private var selectedAnnotation: Pharmacy?
     @State private var showingPulse = false
+    @StateObject private var authService = AuthService.shared
     
     // MARK: - Body
     var body: some View {
@@ -25,6 +26,7 @@ struct PharmaciesMapView: View {
                 PharmacyAnnotationView(
                     pharmacy: pharmacy,
                     isSelected: selectedAnnotation == pharmacy,
+                    isOwnPharmacy: isOwnPharmacy(pharmacy),
                     onTap: {
                         handlePharmacySelection(pharmacy)
                     }
@@ -47,6 +49,16 @@ struct PharmaciesMapView: View {
             showPharmacyDetails = true
         }
     }
+    
+    // Giriş yapan kullanıcının eczanesi mi kontrol et
+    private func isOwnPharmacy(_ pharmacy: Pharmacy) -> Bool {
+        guard let currentUserPharmacistId = authService.currentUserPharmacistId else {
+            return false
+        }
+        
+        // Eczane sahibinin pharmacistId'si ile giriş yapan kullanıcının pharmacistId'sini karşılaştır
+        return pharmacy.owner?.pharmacistId == currentUserPharmacistId
+    }
 }
 
 // MARK: - Pharmacy Annotation View
@@ -55,6 +67,7 @@ private struct PharmacyAnnotationView: View {
     // MARK: - Properties
     let pharmacy: Pharmacy
     let isSelected: Bool
+    let isOwnPharmacy: Bool
     let onTap: () -> Void
     
     // MARK: - State
@@ -71,16 +84,20 @@ private struct PharmacyAnnotationView: View {
                         .frame(width: 44, height: 44)
                         .shadow(radius: 2)
                     
-                    // Pharmacy icon
-                    Image(systemName: "cross.circle.fill")
+                    // Pharmacy icon - farklı ikon kullanıcının kendi eczanesi için
+                    Image(systemName: isOwnPharmacy ? "house.circle.fill" : "cross.circle.fill")
                         .resizable()
                         .frame(width: 28, height: 28)
-                        .foregroundColor(Color(red: 0.4, green: 0.6, blue: 0.4))
+                        .foregroundColor(isOwnPharmacy ? 
+                                       Color(red: 0.2, green: 0.4, blue: 0.8) : // Mavi - kendi eczanesi
+                                       Color(red: 0.4, green: 0.6, blue: 0.4))   // Yeşil - diğer eczaneler
                     
                     // Selection animation ring
                     if isSelected {
                         Circle()
-                            .stroke(Color(red: 0.4, green: 0.6, blue: 0.4), lineWidth: 2)
+                            .stroke(isOwnPharmacy ? 
+                                   Color(red: 0.2, green: 0.4, blue: 0.8) : 
+                                   Color(red: 0.4, green: 0.6, blue: 0.4), lineWidth: 2)
                             .frame(width: 50, height: 50)
                             .scaleEffect(showingPulse ? 1.3 : 1.0)
                             .opacity(showingPulse ? 0 : 1)
@@ -88,6 +105,20 @@ private struct PharmacyAnnotationView: View {
                             .onAppear {
                                 showingPulse = true
                             }
+                    }
+                    
+                    // Kendi eczanesi için özel işaret
+                    if isOwnPharmacy {
+                        Circle()
+                            .fill(Color(red: 0.2, green: 0.4, blue: 0.8))
+                            .frame(width: 12, height: 12)
+                            .offset(x: 18, y: -18)
+                            .overlay(
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 8))
+                                    .foregroundColor(.white)
+                                    .offset(x: 18, y: -18)
+                            )
                     }
                 }
                 
@@ -129,4 +160,4 @@ private struct PharmacyAnnotationView: View {
             span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         ))
     )
-} 
+}

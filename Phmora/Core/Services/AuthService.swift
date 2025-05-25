@@ -1,9 +1,12 @@
 import Foundation
 import Combine
 
-class AuthService {
+class AuthService: ObservableObject {
     static let shared = AuthService()
     private let baseURL = "https://phamorabackend-production.up.railway.app/api"
+    
+    @Published var currentUser: UserResponse?
+    @Published var isLoggedIn: Bool = false
     
     private init() {}
     
@@ -57,6 +60,21 @@ class AuthService {
             }
             .decode(type: LoginResponse.self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
+            .handleEvents(receiveOutput: { [weak self] loginResponse in
+                // Giriş başarılı olduğunda kullanıcı bilgilerini sakla
+                self?.currentUser = loginResponse.user
+                self?.isLoggedIn = true
+            })
             .eraseToAnyPublisher()
+    }
+    
+    func logout() {
+        currentUser = nil
+        isLoggedIn = false
+    }
+    
+    // Giriş yapan kullanıcının eczane ID'sini döndür
+    var currentUserPharmacistId: String? {
+        return currentUser?.pharmacistId
     }
 } 

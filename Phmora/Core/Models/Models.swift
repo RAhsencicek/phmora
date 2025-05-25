@@ -5,6 +5,7 @@ import Foundation
 struct Pharmacy: Identifiable, Codable, Equatable {
     let id: String
     let name: String
+    let owner: PharmacyOwner?
     let address: PharmacyAddress
     let location: PharmacyLocation
     let phone: String
@@ -38,6 +39,7 @@ struct Pharmacy: Identifiable, Codable, Equatable {
     init(name: String, address: String, phone: String, coordinate: CLLocationCoordinate2D, availableMedications: [Medication]) {
         self.id = UUID().uuidString
         self.name = name
+        self.owner = nil
         self.address = PharmacyAddress(street: address, city: "Elazığ", district: "Merkez", postalCode: nil, fullAddress: address)
         self.location = PharmacyLocation(type: "Point", coordinates: [coordinate.longitude, coordinate.latitude])
         self.phone = phone
@@ -57,7 +59,7 @@ struct Pharmacy: Identifiable, Codable, Equatable {
     
     enum CodingKeys: String, CodingKey {
         case id = "_id"
-        case name, address, location, phone, email
+        case name, owner, address, location, phone, email
         case licenseNumber, isActive, isOnDuty
         case workingHours, rating, description, services
         case imageUrl, availableMedications
@@ -334,5 +336,17 @@ extension Medicine {
         case "ointment": return "Merhem"
         default: return dosageForm.capitalized
         }
+    }
+}
+
+struct PharmacyOwner: Codable {
+    let id: String
+    let pharmacistId: String
+    let name: String
+    let surname: String
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case pharmacistId, name, surname
     }
 }

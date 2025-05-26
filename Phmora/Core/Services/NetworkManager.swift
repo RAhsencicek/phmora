@@ -29,7 +29,7 @@ class NetworkManager: ObservableObject {
         
         // Auth header ekle (gerekirse)
         if requiresAuth {
-            if let pharmacistId = UserDefaults.standard.pharmacistId {
+            if let pharmacistId = UserDefaults.standard.string(forKey: "pharmacistId") {
                 request.setValue(pharmacistId, forHTTPHeaderField: "pharmacistId")
             }
         }
@@ -72,9 +72,11 @@ class NetworkManager: ObservableObject {
                 let decoder = JSONDecoder()
                 let formatter = DateFormatter()
                 formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                formatter.locale = Locale(identifier: "en_US_POSIX")
+                formatter.timeZone = TimeZone(secondsFromGMT: 0)
                 decoder.dateDecodingStrategy = .formatted(formatter)
                 
-                // Önce APIResponse formatını dene
+                // Backend'den gelen format: { success: true, data: [...], pagination: {...} }
                 if let apiResponse = try? decoder.decode(APIResponse<T>.self, from: data) {
                     return apiResponse
                 }
@@ -82,6 +84,11 @@ class NetworkManager: ObservableObject {
                 // Eğer APIResponse formatında değilse, direkt data'yı decode et
                 if let directData = try? decoder.decode(T.self, from: data) {
                     return APIResponse<T>(success: true, message: nil, data: directData, pagination: nil)
+                }
+                
+                // JSON string'i debug için yazdır
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("🔍 Failed to decode JSON: \(jsonString)")
                 }
                 
                 // Hiçbiri çalışmazsa hata fırlat

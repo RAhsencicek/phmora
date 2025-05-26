@@ -43,7 +43,7 @@ struct MedicationDetailView: View {
             .navigationTitle("İlaç Detayı")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showPurchaseSheet) {
-                PurchaseView(medication: medication) {
+                PurchaseView(medication: medication, sellerPharmacy: pharmacy) {
                     showPurchaseSheet = false
                 }
             }

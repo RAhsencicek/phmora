@@ -1,6 +1,7 @@
 import SwiftUI
 import CoreLocation
 import MapKit
+import Foundation
 
 // MARK: - App Constants
 /// Central location for all app constants and configuration values
@@ -9,12 +10,11 @@ struct AppConstants {
     // MARK: - Colors
     struct Colors {
         // Ana tema renkleri - karanlık mod uyumlu
-        static let primary = Color(red: 0.4, green: 0.6, blue: 0.4)
-        static let secondary = Color(red: 0.85, green: 0.6, blue: 0.3)
-        
-        // Background renkler - adaptif
-        static let background = Color.primary.opacity(0.05)
-        static let cardBackground = Color.secondary.opacity(0.1)
+        static let primary = Color(red: 0.4, green: 0.5, blue: 0.4)
+        static let secondary = Color.gray
+        static let cardBackground = Color.white
+        static let background = Color(red: 0.98, green: 0.98, blue: 0.98)
+        static let accent = Color.blue
         
         // Text renkler - adaptif
         static let primaryText = Color.primary
@@ -33,24 +33,29 @@ struct AppConstants {
     
     // MARK: - Sizes
     struct Sizes {
-        static let buttonHeight: CGFloat = 44
+        static let buttonHeight: CGFloat = 50
         static let iconSize: CGFloat = 28
-        static let cornerRadius: CGFloat = 10
+        static let cornerRadius: CGFloat = 12
         static let padding: CGFloat = 16
         static let smallPadding: CGFloat = 8
+        static let cardPadding: CGFloat = 16
+        static let spacing: CGFloat = 16
     }
     
     // MARK: - API Configuration
     struct API {
         static let baseURL = "https://phamorabackend-production.up.railway.app/api"
-        static let timeoutInterval: TimeInterval = 30
+        static let timeout: TimeInterval = 30
         
         struct Endpoints {
             static let login = "/auth/login"
             static let register = "/auth/register"
-            static let pharmacies = "/pharmacy"
-            static let nearbyPharmacies = "/pharmacy/nearby"
-            static let medications = "/medications"
+            static let pharmacies = "/pharmacies"
+            static let nearbyPharmacies = "/pharmacies/nearby"
+            static let medications = "/medicines"
+            static let notifications = "/notifications"
+            static let transactions = "/transactions"
+            static let inventory = "/inventory"
         }
     }
     
@@ -83,6 +88,10 @@ struct AppConstants {
     // MARK: - User Defaults Keys
     struct UserDefaultsKeys {
         static let pharmacistId = "pharmacistId"
+        static let userId = "userId"
+        static let pharmacyId = "pharmacyId"
+        static let authToken = "authToken"
+        static let isLoggedIn = "isLoggedIn"
         static let isFirstLaunch = "isFirstLaunch"
         static let selectedLanguage = "selectedLanguage"
     }
@@ -97,10 +106,10 @@ struct AppConstants {
     
     // MARK: - Validation Rules
     struct Validation {
-        static let minPasswordLength = 6
-        static let maxPasswordLength = 50
         static let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         static let phoneRegex = "^[0-9]{10,11}$"
+        static let minPasswordLength = 6
+        static let maxPasswordLength = 50
     }
     
     // MARK: - App Information

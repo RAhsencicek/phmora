@@ -250,7 +250,7 @@ struct SearchView: View {
         isSearching = true
         
         // Gerçek uygulamada API çağrısı yapılır
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [self] in
             withAnimation(.spring()) {
                 var allMedications: [Medication] = []
                 

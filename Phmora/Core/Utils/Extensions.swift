@@ -137,24 +137,7 @@ extension View {
     }
 }
 
-// MARK: - UserDefaults Extensions
-extension UserDefaults {
-    /// Gets pharmacist ID
-    var pharmacistId: String? {
-        get { string(forKey: AppConstants.UserDefaultsKeys.pharmacistId) }
-        set { set(newValue, forKey: AppConstants.UserDefaultsKeys.pharmacistId) }
-    }
-    
-    /// Checks if user is logged in
-    var isUserLoggedIn: Bool {
-        return pharmacistId != nil && !pharmacistId!.isEmpty
-    }
-    
-    /// Removes user session data
-    func clearUserSession() {
-        removeObject(forKey: AppConstants.UserDefaultsKeys.pharmacistId)
-    }
-}
+
 
 // MARK: - Bundle Extensions
 extension Bundle {
